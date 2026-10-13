@@ -273,6 +273,9 @@ zilou.</h1>
     <button class="btn sec" onclick="listarImpressoras()">Atualizar lista</button>
     <button class="btn sec" onclick="imprimirTeste()">Imprimir teste</button>
   </div>
+  <h3>Última venda (papel acabou ou impressora descarregou)</h3>
+  <div class="aviso" id="statusUltimaVenda">-</div>
+  <button class="btn sec" id="btnReimprimir" onclick="reimprimirUltimaVenda()">Reimprimir última venda</button>
   <div id="blocoLeitor">
     <h3>Leitor de cartão (toque para escolher)</h3>
     <div id="leitores"></div>
@@ -459,7 +462,9 @@ const Escpos = {
         return doc;
       },
       regua() { return doc.linha('-'.repeat(W)); },
-      avancar(n) { b.push(0x1B, 0x64, n); return doc; },          // ESC d: n linhas em branco
+      // Linhas em branco com LF puro. O ESC d ("avançar n linhas") é ignorado por várias térmicas
+      // baratas: com ele, mudar a folga do fim do papel não fazia diferença nenhuma.
+      avancar(n) { for (let i = 0; i < n; i++) b.push(0x0A); return doc; },
       tamanho: () => b.length,                                    // bytes montados até aqui
       /** Imagem preto e branco (GS v 0). `escuro(x, y)` diz se o ponto é preto. 58 mm = até 384 pontos de largura. */
       imagem(largura, altura, escuro) {
@@ -994,6 +999,7 @@ function sucesso(forma) {
   // Daqui em diante "reiniciar" não deve cancelar nada: o pedido está pago.
   pedido = Object.assign({}, pedido, {status: 'paid'});
   const pago = {pedido, forma: forma || 'Pix', quando: new Date()};
+  guardarUltimaVenda(pago);
   const imprime = !!impressoraAtual();
   if (modoEvento()) {
     resultado(true, 'Pagamento aprovado!', 'Gerando suas fichas...', pedido.code, []);
@@ -1003,10 +1009,9 @@ function sucesso(forma) {
   sucessoComum(pago, imprime);
 }
 function sucessoComum(pago, imprime) {
-  const acoes = [['Concluir', reiniciar]];
-  if (imprime) acoes.push(['Imprimir de novo', () => imprimirComprovante(pago), 'sec']);
+  // Reimprimir não fica com o cliente: o atendente usa "Reimprimir última venda" no Diagnóstico.
   resultado(true, 'Pagamento aprovado!',
-    imprime ? 'Imprimindo o comprovante...' : 'Retire seu pedido no balcão. Seu código:', pago.pedido.code, acoes);
+    imprime ? 'Imprimindo o comprovante...' : 'Retire seu pedido no balcão. Seu código:', pago.pedido.code, [['Concluir', reiniciar]]);
   if (imprime) imprimirComprovante(pago);
 }
 
@@ -1029,15 +1034,20 @@ function imprimir(doc, prazoMs) {
 const dinheiro = c => (c / 100).toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 const doisDigitos = n => String(n).padStart(2, '0');
 const dataHora = q => `${doisDigitos(q.getDate())}/${doisDigitos(q.getMonth() + 1)}/${q.getFullYear()} ${doisDigitos(q.getHours())}:${doisDigitos(q.getMinutes())}`;
-/** Marca Zilado Pay pequena no fim do papel. O topo fica com o nome do estabelecimento. */
-function marcaNoPapel(d) {
-  if (!window.LOGO_TERMICA) return d;
-  return d.avancar(1).alinhar(1).raster(window.LOGO_TERMICA).alinhar(0);
+/** Linhas em branco depois do logo até ele passar da serrilha. Se sobrar papel demais
+    (ou de menos) na sua impressora, ajuste aqui: cada linha é uns 4 mm. */
+const FOLGA_CORTE = 3;
+/** Marca Zilado Pay pequena no fim do papel e sobe o papel até a serrilha.
+    O topo fica com o nome do estabelecimento. */
+function fimDoPapel(d) {
+  if (window.LOGO_TERMICA) d.avancar(1).alinhar(1).raster(window.LOGO_TERMICA).alinhar(0);
+  return d.avancar(FOLGA_CORTE);
 }
 /** Escreve o comprovante em `d`, sem avançar o papel no fim. */
 function escreverComprovante(d, pago, rodape) {
   const p = pago.pedido, q = pago.quando;
   d.alinhar(1).negrito(true).texto(loja.tenant.name).negrito(false).texto(loja.store.name).regua();
+  if (pago.segundaVia) d.negrito(true).linha('*** 2a VIA ***').negrito(false);
   d.linha('PEDIDO').dobrado(true).negrito(true).linha(p.code).negrito(false).dobrado(false);
   d.alinhar(0).regua();
   for (const i of p.items) {
@@ -1050,7 +1060,7 @@ function escreverComprovante(d, pago, rodape) {
   return d.regua().alinhar(1).texto(rodape || 'Retire seu pedido no balcao.').alinhar(0);
 }
 function montarComprovante(pago) {
-  return marcaNoPapel(escreverComprovante(Escpos.novo(), pago)).avancar(4); // sobe o papel até a serrilha
+  return fimDoPapel(escreverComprovante(Escpos.novo(), pago));
 }
 async function imprimirComprovante(pago) {
   const r = await imprimir(montarComprovante(pago));
@@ -1059,7 +1069,7 @@ async function imprimirComprovante(pago) {
   if (telaAtual() !== 'resultado' || !pedido || pedido.code !== pago.pedido.code) return;
   $('detalheResultado').textContent = r.ok
     ? 'Pegue o comprovante e retire seu pedido no balcão. Seu código:'
-    : 'Não foi possível imprimir o comprovante. Guarde o código do pedido:';
+    : 'Não foi possível imprimir o comprovante. Chame um atendente e mostre o código do pedido:';
 }
 
 
@@ -1108,6 +1118,7 @@ async function emitirFichas(pago, imprime) {
   if (!tickets.length) { prazoResultado = 15000; return sucessoComum(pago, imprime); }
   pago.pedido.tickets = tickets;
   pago.fichas = listarFichas(pago.pedido);
+  guardarUltimaVenda(pago); // agora com as fichas
   if (imprime) return imprimirFichas(pago);
   aviso('Este totem está sem impressora de fichas. Chame um atendente e mostre o código do pedido:');
 }
@@ -1135,7 +1146,7 @@ function montarFichas(pago, fichas, comComprovante) {
   }
   for (const f of fichas) { escreverFicha(d, f, pago.pedido.code, pago.quando); fins.push(d.tamanho()); d.avancar(1); }
   d.alinhar(1).linha('- '.repeat(Escpos.COLUNAS / 2).trim()).alinhar(0); // fecha a última
-  marcaNoPapel(d).avancar(4); // sobe até a serrilha
+  fimDoPapel(d);
   return {doc: d, fins, fimComprovante};
 }
 async function imprimirFichas(pago) {
@@ -1156,36 +1167,27 @@ async function imprimirFichas(pago) {
   log('fichas', {pedido: pago.pedido.code, ok: r.ok, mensagem: r.mensagem, impressas: pago.fichas.filter(f => f.impressa).length, total: pago.fichas.length});
   telaFichas(pago);
 }
-/** Imprime todas de novo (papel acabou, ficha rasgou). Não cria fichas: são as mesmas, com os mesmos códigos. */
-function reimprimirFichas(pago) {
-  if (pago.imprimindo) return;
-  pago.fichas.forEach(f => { f.impressa = false; });
-  pago.reimpressao = true;
-  imprimirFichas(pago);
-}
 function telaFichas(pago) {
   // O cliente pode já ter saído da tela (ou outro pedido pode ter começado).
   if (telaAtual() !== 'resultado' || !pedido || pedido.code !== pago.pedido.code) return;
   const total = pago.fichas.length, faltam = pago.fichas.filter(f => !f.impressa).length;
   const detalhe = t => { $('detalheResultado').textContent = t; };
-  const deNovo = ['Imprimir de novo', () => reimprimirFichas(pago), 'sec'];
   if (pago.imprimindo) {
-    detalhe(pago.reimpressao ? 'Imprimindo as fichas de novo...' : pago.tentativas > 1 ? 'Imprimindo as fichas que faltaram...'
+    detalhe(pago.tentativas > 1 ? 'Imprimindo as fichas que faltaram...'
       : (total === 1 ? 'Imprimindo o comprovante e sua ficha...' : `Imprimindo o comprovante e suas ${total} fichas...`));
     botoesResultado([]); prazoResultado = 0; // não volta ao início no meio da impressão
   } else if (!faltam) {
-    pago.reimpressao = false;
     detalhe(total === 1 ? 'Pegue o comprovante e sua ficha. Entregue a ficha no balcão. Código do pedido:'
       : `Pegue o comprovante e suas ${total} fichas. Entregue uma ficha a cada retirada. Código do pedido:`);
-    botoesResultado([['Concluir', reiniciar], deNovo]); prazoResultado = 15000;
+    botoesResultado([['Concluir', reiniciar]]); prazoResultado = 15000;
   } else if (pago.incerto) {
-    detalhe('A impressora não respondeu. Confira suas fichas: se faltar alguma, imprima de novo ou chame um atendente e mostre o código do pedido:');
-    botoesResultado([['Concluir', reiniciar], deNovo]); prazoResultado = 60000;
+    detalhe('A impressora não respondeu. Confira suas fichas: se faltar alguma, chame um atendente e mostre o código do pedido:');
+    botoesResultado([['Concluir', reiniciar]]); prazoResultado = 60000;
   } else {
     detalhe((faltam === total ? (total === 1 ? 'A ficha não foi impressa.' : 'As fichas não foram impressas.')
       : (faltam === 1 ? `Faltou imprimir 1 das ${total} fichas.` : `Faltou imprimir ${faltam} das ${total} fichas.`))
-      + ' Tente de novo ou chame um atendente e mostre o código do pedido:');
-    botoesResultado([[faltam === 1 ? 'Imprimir a ficha que falta' : `Imprimir as ${faltam} que faltam`, () => imprimirFichas(pago)], ['Concluir', reiniciar, 'sec']]);
+      + ' Chame um atendente e mostre o código do pedido:');
+    botoesResultado([['Concluir', reiniciar]]);
     prazoResultado = 60000;
   }
   armarInatividade('resultado');
@@ -1291,6 +1293,7 @@ function abrirAdmin() {
   $('btnDesparear').textContent = 'Desparear'; confirmandoDesparear = false;
   mostrarQuiosque();
   $('statusImpressora').hidden = true;
+  mostrarUltimaVenda();
   ir('admin'); mostrarInfo(); listarImpressoras(); listarLeitores();
 }
 function fecharAdmin() {
@@ -1360,6 +1363,48 @@ function listarImpressoras() {
   if (impressoraAtual())
     caixa.append(el('button', {class: 'leitor', onclick: () => escolher('', '')}, el('span', {}, 'Não imprimir', el('small', {}, modoEvento() ? 'No modo evento o totem para de vender sem impressora' : 'O totem só mostra o código do pedido na tela'))));
 }
+/* ---------- Última venda ----------
+   Guardada no aparelho para o atendente reimprimir pelo Diagnóstico quando o papel acaba
+   ou a impressora descarrega no meio. Reimprimir não cria fichas: são as mesmas, com os
+   mesmos códigos, e o balcão só aceita cada uma uma vez (ficha já entregue é recusada). */
+const CHAVE_ULTIMA_VENDA = 'totem.ultimaVenda';
+function guardarUltimaVenda(pago) {
+  const {pedido: p, forma, quando} = pago;
+  try { localStorage.setItem(CHAVE_ULTIMA_VENDA, JSON.stringify({pedido: p, forma, quando: quando.toISOString()})); }
+  catch (_) { /* sem espaço: só perde a reimpressão */ }
+}
+function lerUltimaVenda() {
+  try {
+    const v = JSON.parse(localStorage.getItem(CHAVE_ULTIMA_VENDA));
+    return v && v.pedido ? Object.assign(v, {quando: new Date(v.quando)}) : null;
+  } catch (_) { return null; }
+}
+function mostrarUltimaVenda() {
+  const v = lerUltimaVenda(), e = $('statusUltimaVenda');
+  e.className = 'aviso';
+  e.textContent = v
+    ? `Pedido ${v.pedido.code} · ${dataHora(v.quando)} · R$ ${dinheiro(v.pedido.total_cents)} · ${v.forma}`
+      + ((v.pedido.tickets || []).length ? ` · ${v.pedido.tickets.length} ficha(s)` : '')
+    : 'Nenhuma venda neste aparelho ainda.';
+  $('btnReimprimir').disabled = !v;
+}
+let reimprimindo = false;
+async function reimprimirUltimaVenda() {
+  const v = lerUltimaVenda(), e = $('statusUltimaVenda');
+  if (!v || reimprimindo) return;
+  if (!impressoraAtual()) { e.className = 'aviso erro'; e.textContent = 'Escolha a impressora na lista acima antes de reimprimir.'; return; }
+  if (!loja) { e.className = 'aviso erro'; e.textContent = 'Sem os dados da loja (servidor fora do ar). Tente de novo quando ele voltar.'; return; }
+  reimprimindo = true; $('btnReimprimir').disabled = true;
+  e.className = 'aviso'; e.textContent = `Reimprimindo o pedido ${v.pedido.code}...`;
+  const pago = Object.assign(v, {segundaVia: true});
+  const fichas = listarFichas(pago.pedido);
+  const doc = fichas.length ? montarFichas(pago, fichas, true).doc : montarComprovante(pago);
+  const r = await imprimir(doc, 27500 + fichas.length * 4000);
+  log('reimpressão', {pedido: v.pedido.code, ok: r.ok, mensagem: r.mensagem});
+  reimprimindo = false; $('btnReimprimir').disabled = false;
+  e.className = 'aviso ' + (r.ok ? 'ok' : 'erro');
+  e.textContent = (r.ok ? '✓ Reimpresso: pedido ' : '✕ Falhou: pedido ') + v.pedido.code + (r.ok ? '' : ' · ' + r.mensagem);
+}
 async function imprimirTeste() {
   if (!impressoraAtual()) return statusImpressora('Escolha a impressora na lista acima antes de testar.', 'erro');
   statusImpressora('Imprimindo... (pode levar alguns segundos para conectar)');
@@ -1372,7 +1417,7 @@ async function imprimirTeste() {
   d.texto('Acentos saem sem acento: ação, pão, você.').regua();
   // No modo evento sai também uma ficha de exemplo, para conferir o tamanho da letra.
   if (modoEvento()) escreverFicha(d.avancar(1), {nome: 'Produto de exemplo', obs: '', n: 1, total: 1, codigo: 'TESTE22222'}, 'TESTE', new Date(), true);
-  marcaNoPapel(d).avancar(4); // o logo deve sair nítido e centralizado
+  fimDoPapel(d); // o logo deve sair nítido, centralizado e inteiro antes da serrilha
   const r = await imprimir(d);
   log('teste de impressão', r);
   statusImpressora((r.ok ? '✓ ' : '✕ ') + r.mensagem, r.ok ? 'ok' : 'erro');
