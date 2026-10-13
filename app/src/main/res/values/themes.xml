@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Totem" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="android:windowBackground">@color/zilado_fundo</item>
+        <item name="android:statusBarColor">@color/zilado_fundo</item>
+        <item name="android:navigationBarColor">@color/zilado_fundo</item>
+    </style>
+</resources>

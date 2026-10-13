@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Device Owner do totem: só precisa travar a tela no app (Lock Task). -->
+<device-admin>
+    <uses-policies />
+</device-admin>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Identidade Zilado Pay -->
+    <color name="zilado_fundo">#0B1640</color>
+    <color name="zilado_azul">#1F4FD8</color>
+    <color name="zilado_marinho">#0E1B4D</color>
+    <color name="zilado_destaque">#FFB000</color>
+</resources>
