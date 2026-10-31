@@ -106,6 +106,24 @@ O contrato da API está em `totem-api/docs/api-totem.md`.
 
 ### Fluxo de uma venda
 
+- **Avaliação de atendimento:** com `store.rating` no `/me`, a tela de pagamento aprovado mostra
+  a pergunta e 5 estrelas. Tocar já envia (`POST /orders/{uuid}/rating`); tocar em outra troca a
+  nota. As notas ficam na fila `totem.avaliacoes` até o servidor aceitar; no cartão, esperam o
+  pagamento sair da fila de envio, porque só pedido pago pode ser avaliado.
+- **Formulário de leads:** quando o ponto de venda tem formulário ativo (`/me` →
+  `store.lead_form`), ele aparece depois da tela inicial e antes do cardápio, com máscara de
+  telefone e data e a mesma validação do servidor. "Pular" só aparece se ele não for obrigatório
+  (obrigatório mostra "Cancelar", que volta ao início). As respostas vão em `POST /leads`; sem
+  rede, ficam na fila `totem.leads` do aparelho, o cliente segue comprando, e a fila é enviada
+  antes do pedido (`lead_uuid`) e a cada 30 s.
+
+- **Comer aqui ou levar:** quando o ponto de venda liga a pergunta no painel (`/me` →
+  `store.fulfillment.ask`), a tela inicial mostra um botão para cada opção, com o texto do
+  painel, no lugar de "Toque para começar". A escolha aparece no topo do cardápio ("Para levar ·
+  trocar", toque para trocar sem perder o carrinho), vai em `fulfillment` no `POST /orders` e
+  sai em destaque no comprovante e nas fichas. Trocar depois de ir ao pagamento cancela o
+  pedido pendente e cria outro.
+
 - **PIX:** cria o pedido → `POST /orders/{uuid}/pix` → desenha o QR Code de `pix.qr_code` →
   consulta `GET /orders/{uuid}` a cada 3 s até `paid`. Cancelar chama `/cancel`; se o servidor
   responder que já estava pago, a tela mostra aprovado.
@@ -125,6 +143,19 @@ O contrato da API está em `totem-api/docs/api-totem.md`.
   (`POST /admin/unlock`, com limite de tentativas); o app guarda só um hash PBKDF2 do último PIN
   aceito, para entrar sem internet. Aparelho ainda não pareado entra direto (não há loja nem PIN).
   O diagnóstico fecha sozinho depois de 2 minutos sem toque, e a tela do PIN depois de 30 s.
+- **PIN de suporte (PIN geral)**: entra no Diagnóstico de qualquer totem, mesmo sem internet e
+  sem o PIN da loja guardado (é a saída de emergência do modo quiosque). Defina fora do
+  repositório, em `~/.gradle/gradle.properties`: `totem.pinSuporte=12345678` (6 a 8 dígitos).
+  O APK leva só um hash; sem a propriedade, não existe PIN de suporte. Trocou o PIN, gere o APK
+  de novo. Todo erro de PIN conta no limite de 5 por minuto do aparelho.
+- **Saída de emergência nativa**: se a página travar e o Diagnóstico não abrir, aperte
+  3x volume para cima e 3x volume para baixo (até 2 s entre os toques). Abre um teclado de
+  PIN do Android, fora do WebView, que aceita o PIN de suporte ou o último PIN da loja guardado
+  e só tem a opção "Sair do totem". Não depende do servidor. Se o processo do WebView cair,
+  a tela é recriada sozinha em vez de o app fechar.
+- Com o servidor fora, a tela "Sem conexão" tenta de novo em 5 s, 10 s, 20 s e depois a cada
+  30 s; o botão "Tentar agora" força na hora, e a internet voltando no aparelho também. Ela nunca
+  tira o operador da tela do PIN nem do Diagnóstico.
 - Cliente que abandona o totem: depois de 90 s o pedido pendente é cancelado e a tela volta ao início.
 
 ## Modo quiosque (o cliente não sai do app)

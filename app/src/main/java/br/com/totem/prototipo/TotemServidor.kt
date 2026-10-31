@@ -106,6 +106,19 @@ object TotemServidor {
         )
     }
 
+    /**
+     * PIN de suporte (PIN geral), definido na hora de gerar o APK (totem.pinSuporte).
+     * Vale em qualquer totem, com ou sem servidor. Sem PIN de suporte no build, nunca vale.
+     */
+    fun ehPinSuporte(pin: String): Boolean {
+        val esperado = BuildConfig.PIN_SUPORTE_HASH
+        if (esperado.isEmpty()) return false
+        val hash = java.security.MessageDigest.getInstance("SHA-256")
+            .digest("${BuildConfig.PIN_SUPORTE_SAL}:$pin".toByteArray(Charsets.UTF_8))
+            .joinToString("") { "%02x".format(it) }
+        return java.security.MessageDigest.isEqual(hash.toByteArray(), esperado.toByteArray())
+    }
+
     /** O servidor disse que o PIN mudou ou deixou de existir: o guardado não vale mais. */
     fun apagarPin(context: Context) {
         prefs(context).edit().remove(K_PIN_HASH).remove(K_PIN_SAL).apply()

@@ -24,6 +24,8 @@ import java.util.concurrent.Executors
  * JS -> nativo:  window.TotemImpressora.estado()            -> texto JSON { nome, mac }
  *                window.TotemImpressora.listar()            -> texto JSON com os dispositivos pareados
  *                window.TotemImpressora.definir(mac, nome)  mac vazio = não usar impressora
+ *                window.TotemImpressora.papel()             -> texto JSON { largura: 58|80, corte: "serrilha"|"parcial"|"total" }
+ *                window.TotemImpressora.definirPapel(largura, corte)
  *                window.TotemImpressora.imprimir(id, base64)
  *
  * nativo -> JS:  window.Totem.receber({ tipo: "impressao", id, ok, mensagem, enviados })
@@ -86,6 +88,25 @@ class ImpressoraBridge(
             prefs().edit().putString(K_MAC, mac.trim()).putString(K_NOME, nome.trim()).apply()
             Log.i(TAG, "Impressora definida: $nome ($mac)")
         }
+    }
+
+    /**
+     * Largura do papel e tipo de corte da impressora deste aparelho. Ficam aqui, junto da
+     * impressora, porque mudam com o equipamento e não com a loja.
+     * corte: "serrilha" = sem guilhotina (o cliente rasga); "parcial"/"total" = guilhotina.
+     */
+    @JavascriptInterface
+    fun papel(): String = JSONObject()
+        .put("largura", prefs().getInt(K_LARGURA, 58))
+        .put("corte", prefs().getString(K_CORTE, "serrilha"))
+        .toString()
+
+    @JavascriptInterface
+    fun definirPapel(largura: Int, corte: String) {
+        val l = if (largura == 80) 80 else 58
+        val c = corte.takeIf { it in CORTES } ?: "serrilha"
+        prefs().edit().putInt(K_LARGURA, l).putString(K_CORTE, c).apply()
+        Log.i(TAG, "Papel: $l mm, corte: $c")
     }
 
     @JavascriptInterface
@@ -201,6 +222,9 @@ class ImpressoraBridge(
         private const val PREFS = "totem_impressora"
         private const val K_MAC = "mac"
         private const val K_NOME = "nome"
+        private const val K_LARGURA = "papel_largura"
+        private const val K_CORTE = "papel_corte"
+        private val CORTES = setOf("serrilha", "parcial", "total")
         private const val BLOCO = 256
 
         /** Perfil de porta serial (SPP), usado pelas impressoras térmicas Bluetooth. */

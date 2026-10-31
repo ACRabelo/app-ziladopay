@@ -83,14 +83,26 @@ class ApiBridge(
      * 200 libera; 422 PIN errado; 409 loja sem PIN; 429 tentativas demais; 0 sem servidor
      * e sem PIN guardado. Sem pareamento libera (ainda não há loja nem PIN).
      *
-     * Com o servidor fora (ou o totem desativado, 403), vale o hash do último PIN aceito,
-     * com o mesmo limite de 5 erros por minuto.
+     * O PIN de suporte (PIN geral) é conferido no aparelho, antes do servidor, e entra na hora.
+     * Com o servidor fora (ou o totem desativado, 403), vale o hash do último PIN da loja aceito.
+     * Todo erro de PIN conta no limite do aparelho (5 por minuto), com ou sem servidor,
+     * para ninguém ficar chutando o PIN de suporte.
      */
     @JavascriptInterface
     fun desbloquear(id: String, pin: String) {
         rede.execute {
             if (TotemServidor.token(context) == null) {
                 responder(id, ok("sem_pareamento"))
+                return@execute
+            }
+            if (bloqueadoPorErros()) {
+                responder(id, muitasTentativas())
+                return@execute
+            }
+            if (TotemServidor.ehPinSuporte(pin)) {
+                Log.i(TAG, "Diagnóstico aberto com o PIN de suporte")
+                limparErros()
+                responder(id, ok("suporte"))
                 return@execute
             }
             val r = requisitar(
@@ -102,35 +114,43 @@ class ApiBridge(
             when {
                 r.status == 200 -> { TotemServidor.salvarPin(context, pin); limparErros(); responder(id, r) }
                 // PIN errado ou loja sem PIN: o guardado pode ser um PIN antigo, que não vale mais.
-                r.status == 422 || r.status == 409 -> { TotemServidor.apagarPin(context); responder(id, r) }
+                r.status == 422 -> { registrarErro(); TotemServidor.apagarPin(context); responder(id, r) }
+                r.status == 409 -> { TotemServidor.apagarPin(context); responder(id, r) }
+                r.status == 429 -> { registrarErro(); responder(id, r) }
                 r.status == 0 || r.status == 403 || r.status >= 500 -> responder(id, conferirOffline(pin, r))
                 else -> responder(id, r)
             }
         }
     }
 
-    // Erros de PIN sem internet, para o mesmo limite do servidor (5 por minuto).
-    private val errosOffline = ArrayDeque<Long>()
+    // Erros de PIN neste aparelho (com e sem servidor), para o limite de 5 por minuto.
+    private val errosPin = ArrayDeque<Long>()
 
     @Synchronized
-    private fun conferirOffline(pin: String, falhaServidor: Resposta): Resposta {
+    private fun bloqueadoPorErros(): Boolean {
         val agora = System.currentTimeMillis()
-        while (errosOffline.isNotEmpty() && agora - errosOffline.first() > 60_000) errosOffline.removeFirst()
-        if (errosOffline.size >= 5) {
-            return Resposta(429, JSONObject().put("message", "Muitas tentativas. Aguarde um minuto.").toString())
-        }
-        return when (TotemServidor.conferirPin(context, pin)) {
-            null -> falhaServidor // nunca entrou com PIN neste aparelho: depende do servidor
-            true -> { errosOffline.clear(); ok("offline") }
-            false -> {
-                errosOffline.addLast(agora)
-                Resposta(422, JSONObject().put("message", "PIN incorreto.").put("code", "pin_invalid").toString())
-            }
-        }
+        while (errosPin.isNotEmpty() && agora - errosPin.first() > 60_000) errosPin.removeFirst()
+        return errosPin.size >= 5
     }
 
     @Synchronized
-    private fun limparErros() = errosOffline.clear()
+    private fun registrarErro() = errosPin.addLast(System.currentTimeMillis())
+
+    @Synchronized
+    private fun limparErros() = errosPin.clear()
+
+    private fun muitasTentativas() =
+        Resposta(429, JSONObject().put("message", "Muitas tentativas. Aguarde um minuto.").toString())
+
+    private fun conferirOffline(pin: String, falhaServidor: Resposta): Resposta =
+        when (TotemServidor.conferirPin(context, pin)) {
+            null -> falhaServidor // nunca entrou com o PIN da loja neste aparelho: depende do servidor
+            true -> { limparErros(); ok("offline") }
+            false -> {
+                registrarErro()
+                Resposta(422, JSONObject().put("message", "PIN incorreto.").put("code", "pin_invalid").toString())
+            }
+        }
 
     private fun ok(modo: String) = Resposta(200, JSONObject().put("data", JSONObject().put("ok", true).put("modo", modo)).toString())
 

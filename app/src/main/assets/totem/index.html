@@ -25,6 +25,9 @@
   h1,h2,.toque{font-style:italic;font-weight:900;font-stretch:112%}
   .logo-grande{width:min(72vw,24rem);height:auto;flex:none}
   .logo-topo{height:2.6rem;width:auto;align-self:flex-start;margin-bottom:6px}
+  /* Marca branca: logo do cliente numa plaquinha branca (pode ser escuro e sumir no marinho). */
+  img.logo-cliente{background:#fff;border-radius:16px;padding:8px 14px;object-fit:contain;box-sizing:content-box;max-width:70vw}
+  .logo-grande.logo-cliente{width:auto;height:min(26vh,12rem)}
   .tela{position:absolute;inset:0;display:none;flex-direction:column;padding:28px 22px}
   .tela.ativa{display:flex}
   h1{font-size:2.4rem;line-height:1.05;letter-spacing:-.02em}
@@ -80,6 +83,31 @@
   #inicio #chamada{color:var(--txt-inicio, var(--suave))}
   #inicio.cor-propria #chamada{opacity:.85}
   #inicio .assinatura{align-self:center;height:2.4rem;width:auto;opacity:.85}
+  /* Formulário de leads (antes do cardápio) */
+  #formulario{gap:14px}
+  #formulario .perguntas{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:16px;padding-bottom:8px}
+  #formulario .pergunta{display:flex;flex-direction:column;gap:8px}
+  #formulario .pergunta > span{font-weight:700;font-size:1.05rem}
+  #formulario .pergunta > span i{color:var(--acento);font-style:normal}
+  #formulario input{background:var(--painel);border:2px solid var(--linha);border-radius:14px;padding:16px;font-size:1.2rem;
+    color:var(--txt);width:100%;outline:none}
+  #formulario input:focus{border-color:var(--acento)}
+  #formulario .pergunta.invalida input,#formulario .pergunta.invalida .opcoes{border-color:var(--erro)}
+  #formulario .opcoes{display:flex;flex-wrap:wrap;gap:10px;border:2px solid transparent;border-radius:14px}
+  #formulario .opcoes button{padding:14px 18px;border-radius:999px;border:2px solid var(--linha);background:var(--painel);font-size:1.05rem;font-weight:700}
+  #formulario .opcoes button.sel{border-color:var(--acento);background:var(--acento);color:var(--acento-txt)}
+  #formulario .erro-campo{color:var(--erro);font-size:.9rem}
+  #formulario .aceite{display:flex;gap:12px;align-items:flex-start;padding:14px;border:2px solid var(--linha);border-radius:14px;font-size:.95rem;color:var(--suave)}
+  #formulario .aceite input{width:28px;height:28px;flex:none;accent-color:var(--acento);padding:0}
+  #formulario .aceite.invalida{border-color:var(--erro)}
+  #formulario .acoes{display:flex;flex-direction:column;gap:10px}
+
+  /* Comer aqui ou levar: dois botões no lugar de "Toque para começar" */
+  #inicio .opcoes-entrega{margin-top:auto;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  #inicio .opcoes-entrega .toque{margin-top:0;padding:30px 14px;font-size:1.45rem;line-height:1.1;overflow-wrap:anywhere;animation:none}
+  #inicio .opcoes-entrega .toque.sec{background:var(--txt-inicio, var(--txt));color:var(--bg)}
+  .chip-entrega{align-self:flex-start;margin:-8px 0 12px;padding:8px 14px;border-radius:999px;border:2px solid var(--acento);
+    color:var(--acento);font-weight:800;font-size:.95rem}
   #inicio .toque{margin-top:auto;width:100%;text-align:center;padding:28px;border-radius:var(--raio);
     background:var(--acento);color:var(--acento-txt);font-weight:800;font-size:1.5rem;animation:pulsa 2s infinite}
   @keyframes pulsa{50%{transform:scale(1.02)}}
@@ -87,25 +115,40 @@
   /* Cardápio */
   .lista{flex:1;overflow:auto;display:flex;flex-direction:column;gap:12px;margin:8px 0 16px;-webkit-overflow-scrolling:touch}
   .categoria{font-size:.85rem;letter-spacing:.18em;text-transform:uppercase;color:var(--acento);margin:10px 4px 0}
-  .grade{display:grid;grid-template-columns:1fr;gap:12px}
-  @media (min-width:760px){ .grade{grid-template-columns:1fr 1fr} }
-  .item{display:flex;align-items:center;gap:14px;background:var(--painel);border:1px solid var(--linha);
-    border-radius:var(--raio);padding:14px}
-  .item .foto{width:64px;height:64px;border-radius:14px;flex:none;background:var(--linha);display:grid;place-items:center;
-    font-size:1.6rem;font-weight:800;color:var(--suave);overflow:hidden}
+  /* Cartões com a foto em cima (2 colunas no tablet em pé, 3 ou 4 em telas maiores). */
+  .grade{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;align-items:stretch}
+  @media (min-width:600px){ .grade{grid-template-columns:repeat(3,1fr)} }
+  @media (min-width:1100px) and (orientation:landscape){ .grade{grid-template-columns:repeat(4,1fr)} }
+  .item{display:flex;flex-direction:column;background:var(--painel);border:2px solid var(--linha);
+    border-radius:var(--raio);overflow:hidden}
+  .item.no-pedido{border-color:var(--acento)}
+  .item .foto{aspect-ratio:1/.9;background:var(--linha);display:grid;place-items:center;
+    font-size:3.2rem;font-weight:800;color:var(--suave);overflow:hidden}
   .item .foto img{width:100%;height:100%;object-fit:cover}
-  .item .texto{min-width:0}
-  .item .nome{font-weight:700;font-size:1.1rem}
+  .item .texto{display:flex;flex-direction:column;gap:4px;padding:12px 12px 14px;flex:1;min-width:0}
+  .item .nome{font-weight:700;font-size:1.1rem;line-height:1.2}
   .item .desc{color:var(--suave);font-size:.85rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-  .item .preco{color:var(--acento);font-weight:700;margin-top:2px}
-  .qtd{margin-left:auto;display:flex;align-items:center;gap:10px;flex:none}
-  .qtd button{width:44px;height:44px;border-radius:50%;background:var(--linha);font-size:1.4rem;font-weight:700}
+  .item .base{margin-top:auto;padding-top:8px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+  .item .preco{color:var(--acento);font-weight:800;font-size:1.15rem;white-space:nowrap}
+  .item .adicionar{margin-left:auto;padding:10px 14px;border-radius:12px;background:var(--acento);color:var(--acento-txt);
+    font-weight:800;font-size:.95rem;white-space:nowrap}
+  .item .adicionar:disabled{opacity:.35}
+  /* "Últimas 3 unidades": só aparece quando o servidor diz que está acabando (stock_low). */
+  .restam{align-self:flex-start;margin-top:2px;padding:2px 8px;border-radius:999px;font-size:.8rem;font-weight:700;
+    background:#3a1414;color:#ffb3b3;border:1px solid var(--erro);line-height:1.25}
+  .qtd button:disabled{opacity:.3}
+  .qtd{margin-left:auto;display:flex;align-items:center;gap:8px;flex:none}
+  .qtd button{width:42px;height:42px;border-radius:50%;background:var(--linha);font-size:1.4rem;font-weight:700}
   .qtd span{min-width:22px;text-align:center;font-weight:700;font-size:1.2rem}
   .rodape{display:flex;flex-direction:column;gap:12px}
   .total{display:flex;justify-content:space-between;font-size:1.4rem;font-weight:700}
 
   /* Formas */
   .formas{display:flex;flex-direction:column;gap:14px;flex:1;justify-content:center}
+  #nota .cpf{font-size:2rem;font-weight:700;letter-spacing:.06em;text-align:center;min-height:3rem;padding:8px;
+    border-radius:16px;background:var(--painel);border:2px solid var(--linha);width:100%;max-width:26rem;margin:0 auto}
+  #nota .cpf.invalido{border-color:#d33}
+  .nota-escolha{font-size:.95rem;background:none;border:0;text-decoration:underline;color:inherit;opacity:.8;padding:4px}
   .forma{background:var(--painel);border:2px solid var(--linha);border-radius:var(--raio);
     padding:26px;font-size:1.5rem;font-weight:700;text-align:left;display:flex;gap:16px;align-items:center}
   .forma:active{border-color:var(--acento)}
@@ -118,6 +161,13 @@
   #pix .valor{font-size:2rem;font-weight:800}
   #pix .passos{color:var(--suave);font-size:1rem;line-height:1.5}
   #pix .relogio{font-variant-numeric:tabular-nums;font-weight:700;color:var(--acento)}
+  /* Maquininha integrada (Mercado Pago Point) */
+  #maquininha .maq-icone{font-size:4.5rem;line-height:1;animation:pulsar 1.6s ease-in-out infinite}
+  @keyframes pulsar{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+  #maquininha .valor{font-size:2.2rem;font-weight:800}
+  #maquininha .maq-passo{font-size:1.35rem;font-weight:700;max-width:28ch;line-height:1.35}
+  #maquininha .maq-passo.alerta{color:var(--acento)}
+  #maquininha .relogio{font-variant-numeric:tabular-nums;font-weight:700;color:var(--acento)}
   #pix .btn{margin-top:auto}
 
   /* Cartão */
@@ -129,6 +179,13 @@
   .selo.ok{background:var(--ok);color:#06210f}
   .selo.erro{background:var(--erro);color:#2a0505}
   .senha{font-size:2.6rem;font-weight:900;letter-spacing:.12em;font-family:ui-monospace,Menlo,monospace}
+  /* Avaliação de atendimento (1 a 5 estrelas) */
+  #avaliacao{display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:6px}
+  #avaliacao .pergunta-aval{font-weight:700;font-size:1.15rem}
+  #avaliacao .estrelas{display:flex;gap:6px}
+  #avaliacao .estrelas button{font-size:3rem;line-height:1;padding:6px;color:var(--linha);font-style:normal}
+  #avaliacao .estrelas button.cheia{color:var(--acento)}
+  #avaliacao .obrigado{color:var(--suave);min-height:1.4em}
   #resultado .acoes{margin-top:auto;width:100%;display:flex;flex-direction:column;gap:12px}
 
   /* Admin (toque 5x no canto superior direito) */
@@ -144,7 +201,11 @@
   .leitor small{display:block;font-weight:400;color:var(--suave);font-size:.8rem}
   .leitor.sel{border-color:var(--ok)}
   .leitor .tag{font-size:.75rem;font-weight:700;color:var(--ok);white-space:nowrap}
+  /* Temas: cada um mora em temas/<nome>.css e temas/<nome>.js e só vale com body.tema-<nome>.
+     Os elementos próprios de um tema (classe .so-tema) ficam escondidos fora dele. */
+  .so-tema{display:none !important}
 </style>
+<link rel="stylesheet" href="temas/mrcold.css">
 </head>
 <body>
 
@@ -152,7 +213,7 @@
 
 <!-- Abrindo / esperando o servidor -->
 <section class="tela centro ativa" id="espera">
-  <img class="logo-grande" src="zilado-pay.svg" alt="Zilado Pay">
+  <img class="logo-grande" data-marca src="zilado-pay.svg" alt="Zilado Pay">
   <div class="anel"></div>
   <h2 id="esperaTitulo">Abrindo o totem...</h2>
   <p class="suave" id="esperaDetalhe"></p>
@@ -160,7 +221,7 @@
 
 <!-- Primeira configuração: código mostrado no painel (Estrutura > Totens > Parear) -->
 <section class="tela" id="parear">
-  <img class="logo-topo" src="zilado-pay.svg" alt="Zilado Pay">
+  <img class="logo-topo" data-marca src="zilado-pay.svg" alt="Zilado Pay">
   <h2>Parear este aparelho</h2>
   <p class="suave">No painel, abra <b>Estrutura &rsaquo; Totens</b>, toque em <b>Parear</b> e digite aqui o código de 8 números.</p>
   <div class="digitos" id="digitos"></div>
@@ -178,6 +239,7 @@
   <h1 id="indisponivelTitulo">Totem indisponível</h1>
   <p class="suave" id="indisponivelDetalhe"></p>
   <p class="suave" id="indisponivelRetry"></p>
+  <button class="btn sec" id="btnTentarAgora" onclick="tentarAgora()" style="align-self:center;margin-top:8px">Tentar agora</button>
 </section>
 
 <!-- 1. Início -->
@@ -186,13 +248,27 @@
   <h1 id="frase">Pediu, pagou,
 zilou.</h1>
   <p class="suave" id="chamada">Sem fila. Escolha, pague e retire no balcão.</p>
-  <button class="toque" onclick="comecar()">Toque para começar</button>
-  <img class="assinatura" src="zilado-pay.svg" alt="Zilado Pay">
+  <div id="botoesInicio" style="margin-top:auto;width:100%;display:flex">
+    <button class="toque" onclick="comecar()">Toque para começar</button>
+  </div>
+  <img class="assinatura" data-marca src="zilado-pay.svg" alt="Zilado Pay">
+</section>
+
+<!-- 1b. Formulário de leads (Clientes > Formulários, no painel). Só aparece se o ponto de venda tiver um ativo. -->
+<section class="tela" id="formulario">
+  <h2 id="formTitulo"></h2>
+  <p class="suave" id="formIntro"></p>
+  <div class="perguntas" id="formPerguntas"></div>
+  <div class="acoes">
+    <button class="btn" id="formEnviar" onclick="enviarFormulario()">Continuar</button>
+    <button class="btn sec" id="formPular" onclick="pularFormulario()">Pular</button>
+  </div>
 </section>
 
 <!-- 2. Cardápio -->
 <section class="tela" id="cardapio">
   <h2>O que vai ser hoje?</h2>
+  <button class="chip-entrega" id="chipEntrega" hidden onclick="trocarEntrega()"></button>
   <div class="lista" id="lista"></div>
   <div class="rodape">
     <div class="total"><span>Total</span><span id="total">R$ 0,00</span></div>
@@ -201,10 +277,32 @@ zilou.</h1>
   </div>
 </section>
 
+<!-- 2b. Nota fiscal (NFC-e no modo "sob solicitação"): o consumidor quer nota? CPF opcional. -->
+<section class="tela" id="nota">
+  <h2>Deseja nota fiscal?</h2>
+  <div id="notaPergunta" class="formas">
+    <button class="forma" onclick="abrirCpf()">🧾<span>Sim, com CPF<small>digite o CPF na próxima tela</small></span></button>
+    <button class="forma" onclick="escolherNota(true, null)">🧾<span>Sim, sem CPF<small>consumidor não identificado</small></span></button>
+    <button class="forma" onclick="escolherNota(false, null)">✕<span>Não, obrigado</span></button>
+  </div>
+  <div id="notaCpf" hidden style="display:flex;flex-direction:column;gap:12px;flex:1">
+    <p class="suave" style="text-align:center;margin:0">Digite o CPF</p>
+    <div class="cpf" id="cpfDigitado"></div>
+    <div class="aviso erro" id="cpfErro" hidden></div>
+    <div class="teclado" id="tecladoCpf"></div>
+    <div class="linha2">
+      <button class="btn sec" onclick="voltarPerguntaNota()">Voltar</button>
+      <button class="btn" id="btnCpf" onclick="confirmarCpf()" disabled>Continuar</button>
+    </div>
+  </div>
+  <button class="btn sec" id="notaVoltar" onclick="ir('cardapio')">Voltar ao pedido</button>
+</section>
+
 <!-- 3. Forma de pagamento -->
 <section class="tela" id="formas">
   <h2>Como quer pagar?</h2>
   <p class="suave" id="totalFormas"></p>
+  <button class="nota-escolha" id="notaEscolhida" hidden onclick="perguntarNota()"></button>
   <div class="formas" id="opcoesFormas"></div>
   <button class="btn sec" onclick="ir('cardapio')">Voltar</button>
 </section>
@@ -218,6 +316,17 @@ zilou.</h1>
     Este código vale por <span class="relogio" id="pixRelogio">--:--</span></p>
   <p class="suave" id="pixStatus">Aguardando o pagamento...</p>
   <button class="btn sec" id="btnCancelarPix" onclick="cancelarPix()">Cancelar</button>
+</section>
+
+<!-- 4c. Maquininha integrada (Mercado Pago Point): o servidor manda a cobrança para ela -->
+<section class="tela centro" id="maquininha">
+  <div class="maq-icone" id="maqIcone" aria-hidden="true">💳</div>
+  <h2 id="maqTitulo">Pague na maquininha</h2>
+  <div class="valor" id="maqValor"></div>
+  <p class="suave" id="maqForma"></p>
+  <p class="maq-passo" id="maqPasso">Enviando para a maquininha...</p>
+  <p class="suave">Tempo para pagar: <span class="relogio" id="maqRelogio">--:--</span></p>
+  <button class="btn sec" id="btnCancelarMaq" onclick="cancelarMaquininha()">Cancelar</button>
 </section>
 
 <!-- 4b. Cartão: acompanhando o leitor -->
@@ -234,12 +343,18 @@ zilou.</h1>
   <h1 id="tituloResultado"></h1>
   <p class="suave" id="detalheResultado"></p>
   <div class="senha" id="senha" hidden></div>
+  <!-- Avaliação de atendimento: só depois de pagamento aprovado e se o ponto de venda ligou. Opcional. -->
+  <div id="avaliacao" hidden>
+    <span class="pergunta-aval" id="avalPergunta"></span>
+    <div class="estrelas" id="avalEstrelas" role="radiogroup"></div>
+    <span class="obrigado" id="avalObrigado"></span>
+  </div>
   <div class="acoes" id="acoesResultado"></div>
 </section>
 
 <!-- PIN: porta da área de diagnóstico (5 toques no canto). O PIN é do ponto de venda, definido no painel. -->
 <section class="tela" id="pin">
-  <img class="logo-topo" src="zilado-pay.svg" alt="Zilado Pay" style="align-self:center">
+  <img class="logo-topo" data-marca src="zilado-pay.svg" alt="Zilado Pay" style="align-self:center">
   <h2>Acesso do operador</h2>
   <p class="suave" style="text-align:center;margin:0">Digite o PIN do ponto de venda</p>
   <div class="pontos" id="pinPontos" aria-live="polite"></div>
@@ -268,6 +383,8 @@ zilou.</h1>
   </div>
   <h3>Impressora de comprovante ou fichas (toque para escolher)</h3>
   <div id="impressoras"></div>
+  <h3>Papel da impressora</h3>
+  <div id="papelImpressora"></div>
   <div class="aviso" id="statusImpressora" hidden></div>
   <div class="linha2">
     <button class="btn sec" onclick="listarImpressoras()">Atualizar lista</button>
@@ -289,12 +406,15 @@ zilou.</h1>
       <button class="btn sec" onclick="Nativo.autenticar()">Login PagBank</button>
     </div>
   </div>
+  <h3>Aparência da tela do cliente</h3>
+  <div id="temas"></div>
   <pre id="log"></pre>
   <button class="btn" onclick="fecharAdmin()">Fechar</button>
 </section>
 
 <script src="marca.js"></script>
 <script src="qrcode.js"></script>
+<script src="temas/mrcold.js"></script>
 <script>
 'use strict';
 
@@ -385,6 +505,8 @@ const PonteApi = window.TotemApi || (() => {
      estado()               -> texto JSON {nome, mac} (vazio se nenhuma escolhida)
      listar()               -> texto JSON {permissao, bluetoothLigado, dispositivos:[{nome, mac, leitor, selecionado}]}
      definir(mac, nome)     mac vazio = não usar impressora
+     papel()                -> texto JSON {largura: 58|80, corte: 'serrilha'|'parcial'|'total'}
+     definirPapel(largura, corte)
      imprimir(id, base64)   -> responde em Totem.receber({tipo:'impressao', id, ok, mensagem, enviados})
                                enviados = bytes que chegaram à impressora (-1 = não dá para saber)
    No navegador nada é impresso: os bytes ficam em window.impressoes para conferir. */
@@ -410,6 +532,8 @@ const PonteImpressora = window.TotemImpressora || (() => {
       {nome: 'Impressora simulada', mac: '66:22:33:44:55:66', leitor: false, selecionado: !!atual && atual.mac === '66:22:33:44:55:66'},
       {nome: 'PAX-12345678', mac: '00:11:22:33:44:55', leitor: true, selecionado: false}]}),
     definir: (mac, nome) => { atual = mac ? {mac, nome} : null; localStorage.setItem('totem.impressora', JSON.stringify(atual)); },
+    papel: () => localStorage.getItem('totem.papel') || JSON.stringify({largura: 58, corte: 'serrilha'}),
+    definirPapel: (largura, corte) => localStorage.setItem('totem.papel', JSON.stringify({largura, corte})),
     imprimir: (id, base64) => {
       const bytes = atob(base64); window.impressoes.push(bytes);
       setTimeout(() => Totem.receber({tipo: 'impressao', id, ok: true, mensagem: 'Impresso (simulado no navegador)', enviados: bytes.length}), 400);
@@ -423,7 +547,7 @@ const PonteImpressora = window.TotemImpressora || (() => {
    O texto vai sem acento: cada impressora usa uma tabela de caracteres diferente
    e "ã", "ç" costumam sair como símbolo estranho. */
 const Escpos = {
-  COLUNAS: 32, // papel de 58 mm, letra normal. Papel de 80 mm: 48.
+  COLUNAS: 32, // letra normal: 58 mm = 32 colunas, 80 mm = 48. Ajustado por aplicarPapel().
   limpar: t => String(t == null ? '' : t).normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^\x20-\x7E]/g, '?'),
   /** Quebra em linhas de até `largura` caracteres, sem cortar palavra (a não ser que ela não caiba sozinha). */
   quebrar(texto, largura) {
@@ -465,8 +589,11 @@ const Escpos = {
       // Linhas em branco com LF puro. O ESC d ("avançar n linhas") é ignorado por várias térmicas
       // baratas: com ele, mudar a folga do fim do papel não fazia diferença nenhuma.
       avancar(n) { for (let i = 0; i < n; i++) b.push(0x0A); return doc; },
+      /** Guilhotina (GS V): parcial deixa uma pontinha presa, total solta o papel.
+          Antes, avance o papel até o texto passar da lâmina (ver FOLGA_GUILHOTINA). */
+      cortar(parcial) { b.push(0x1D, 0x56, parcial ? 0x01 : 0x00); return doc; },
       tamanho: () => b.length,                                    // bytes montados até aqui
-      /** Imagem preto e branco (GS v 0). `escuro(x, y)` diz se o ponto é preto. 58 mm = até 384 pontos de largura. */
+      /** Imagem preto e branco (GS v 0). `escuro(x, y)` diz se o ponto é preto. 58 mm = até 384 pontos de largura, 80 mm = 576. */
       imagem(largura, altura, escuro) {
         const porLinha = Math.ceil(largura / 8);
         b.push(0x1D, 0x76, 0x30, 0x00, porLinha & 255, porLinha >> 8, altura & 255, altura >> 8);
@@ -485,10 +612,13 @@ const Escpos = {
         return doc;
       },
       /** QR Code desenhado como imagem: o comando próprio de QR não existe em muita impressora barata.
-          Só letras maiúsculas e números. Cada quadradinho tem `ponto` pontos (8 pontos = 1 mm). */
+          Código de ficha (maiúsculas e números) vai no modo alfanumérico, mais compacto; texto
+          qualquer (URL da NFC-e) vai no modo byte. Cada quadradinho tem `ponto` pontos (8 pontos = 1 mm). */
       qr(texto, ponto) {
         ponto = ponto || 8;
-        const q = qrcode(0, 'Q'); q.addData(String(texto), 'Alphanumeric'); q.make();
+        texto = String(texto);
+        const alfa = /^[0-9A-Z $%*+\-./:]*$/.test(texto);
+        const q = qrcode(0, alfa ? 'Q' : 'M'); q.addData(texto, alfa ? 'Alphanumeric' : 'Byte'); q.make();
         const n = q.getModuleCount(), margem = 2, lado = (n + margem * 2) * ponto;
         return doc.imagem(lado, lado, (x, y) => {
           const c = Math.floor(x / ponto) - margem, l = Math.floor(y / ponto) - margem;
@@ -533,6 +663,10 @@ let categorias = [];             // resposta de /catalog
 let cardapioEm = 0;              // quando o cardápio foi carregado
 const carrinho = new Map();      // id do produto -> quantidade
 let pedido = null;               // pedido criado no servidor para o carrinho atual
+let entrega = null;              // "dine_in" | "takeaway", escolhido na tela inicial; null = a loja não pergunta
+let leadUuid = null;             // formulário respondido por este cliente (vai no pedido)
+let nota = null;                 // NFC-e sob solicitação: {requested, cpf}; null = ainda não perguntado
+let formRespondido = false;      // respondido ou pulado: não mostra de novo para o mesmo cliente
 let tentativa = null;            // {uuid, assinatura}: mesmo uuid ao repetir a criação
 let cartao = null;               // cobrança no leitor em andamento
 let timerPix = null, timerRelogio = null, timerInatividade = null, timerRetry = null;
@@ -543,6 +677,31 @@ const $ = id => document.getElementById(id);
 const produtos = () => categorias.flatMap(c => c.products);
 const total = () => produtos().reduce((s, p) => s + (carrinho.get(p.id) || 0) * p.price_cents, 0);
 const assinatura = () => JSON.stringify([...carrinho].filter(([, q]) => q > 0).sort((a, b) => a[0] - b[0]));
+
+/* Estoque. O servidor manda stock_available (quanto ainda dá para vender; null = sem limite)
+   e stock_low (está acabando). O número só serve para travar o "+": o cliente nunca vê
+   quanto há em estoque, só o aviso "Últimas N unidades" quando stock_low vem true. */
+const MAX_POR_ITEM = 99;
+const limiteDe = p => p.stock_available == null ? MAX_POR_ITEM : Math.min(MAX_POR_ITEM, p.stock_available);
+const podeMais = p => (carrinho.get(p.id) || 0) < limiteDe(p);
+function textoRestam(p) {
+  if (p.stock_available == null) return null;
+  if (p.stock_low) return p.stock_available === 1 ? 'Última unidade' : `Últimas ${p.stock_available} unidades`;
+  // Muita gente pedindo o mesmo item: explica por que o "+" parou, sem dizer o número.
+  if (!podeMais(p) && limiteDe(p) < MAX_POR_ITEM) return 'Máximo disponível';
+  return null;
+}
+/** Selo "Últimas N unidades" (ou null). Os temas também usam. */
+function seloRestam(p, classe) { const t = textoRestam(p); return t ? el('span', {class: classe || 'restam'}, t) : null; }
+/** Depois de recarregar o cardápio: carrinho acima do que sobrou desce para o limite. Devolve se mudou algo. */
+function ajustarCarrinhoAoEstoque() {
+  let mudou = false;
+  for (const p of produtos()) {
+    const q = carrinho.get(p.id) || 0, lim = limiteDe(p);
+    if (q > lim) { mudou = true; if (lim > 0) carrinho.set(p.id, lim); else carrinho.delete(p.id); }
+  }
+  return mudou;
+}
 function uuid() {
   const b = crypto.getRandomValues(new Uint8Array(16));
   b[6] = (b[6] & 0x0f) | 0x40; b[8] = (b[8] & 0x3f) | 0x80;
@@ -577,7 +736,7 @@ function armarInatividade(id) {
   // Diagnóstico aberto e esquecido: fecha sozinho (e pede o PIN de novo na próxima vez).
   if (id === 'admin') { timerInatividade = setTimeout(fecharAdmin, 120000); return; }
   if (id === 'pin') { timerInatividade = setTimeout(cancelarPin, 30000); return; }
-  if (!['cardapio', 'formas', 'resultado'].includes(id)) return;
+  if (!['formulario', 'cardapio', 'formas', 'resultado'].includes(id)) return;
   const prazo = id === 'resultado' ? prazoResultado : 90000;
   if (prazo) timerInatividade = setTimeout(reiniciar, prazo);
 }
@@ -592,7 +751,8 @@ async function iniciar() {
   const estado = JSON.parse(PonteApi.estado());
   if (!estado.pareado) return abrirPareamento();
   espera('Abrindo o totem...', estado.servidor);
-  await carregar();
+  // App fechou ou o tablet reiniciou no meio de um pagamento na maquininha: retoma.
+  if (await carregar()) await retomarMaquininha();
 }
 
 /** Busca loja e cardápio. Devolve true se deu certo; se não, mostra o motivo e tenta de novo sozinho. */
@@ -608,17 +768,23 @@ async function carregar() {
     // Produto que saiu do cardápio sai do carrinho.
     const validos = new Set(produtos().map(p => p.id));
     [...carrinho.keys()].forEach(id => validos.has(id) || carrinho.delete(id));
+    ajustarCarrinhoAoEstoque();
+    escolherTema();
+    aplicarMarca(loja);
     $('marca').textContent = loja.tenant.name;
     $('chamada').textContent = loja.store.event_mode
       ? 'Sem fila. Escolha, pague e pegue suas fichas.'
       : 'Sem fila. Escolha, pague e retire no balcão.';
     aplicarInicio(loja.store.home);
+    desenharBotoesInicio();
     desenharCardapio(); enviarPendentes();
     // Cliente no meio do pedido e operador no Diagnóstico não são tirados da tela;
     // se o cliente tentar pagar, o servidor recusa (423) e a tela de bloqueio aparece.
-    if (bloqueio && !['cardapio', 'formas', 'admin'].includes(telaAtual())) { avisarBloqueio(); return false; }
-    if (faltaImpressora() && !['cardapio', 'formas', 'admin'].includes(telaAtual())) { avisarFaltaImpressora(); return false; }
+    tentativasRetry = 0;
+    if (bloqueio && !['cardapio', 'formas', ...TELAS_OPERADOR].includes(telaAtual())) { avisarBloqueio(); return false; }
+    if (faltaImpressora() && !['cardapio', 'formas', ...TELAS_OPERADOR].includes(telaAtual())) { avisarFaltaImpressora(); return false; }
     if (['espera', 'indisponivel'].includes(telaAtual())) ir('inicio');
+    if (operadorNaTela() && ['espera', 'indisponivel'].includes(telaAntes)) telaAntes = 'inicio';
     return true;
   }
   const falha = eu.ok ? cat : eu;
@@ -631,14 +797,48 @@ async function carregar() {
   return false;
 }
 /* =====================================================================
+   MARCA: Zilado Pay ou, com o servidor em marca branca (MODO_WHITELABEL), o logo do
+   cliente (Meu negócio, no painel). Sem logo do cliente, os logos somem e fica o nome.
+   Guardada no aparelho para a tela "Abrindo o totem..." já sair certa depois de reiniciar.
+   ===================================================================== */
+const CHAVE_MARCA = 'totem.marca';
+let marca = {whitelabel: false, logo_url: null, nome: null};
+function aplicarMarca(dados) {
+  marca = dados && dados.tenant
+    ? {whitelabel: !!dados.whitelabel, logo_url: dados.tenant.logo_url || null, nome: dados.tenant.name}
+    : (dados || {whitelabel: false, logo_url: null, nome: null});
+  try { localStorage.setItem(CHAVE_MARCA, JSON.stringify(marca)); } catch (_) { /* sem armazenamento */ }
+  const wl = marca.whitelabel;
+  document.querySelectorAll('img[data-marca]').forEach(img => {
+    const src = wl ? marca.logo_url : 'zilado-pay.svg';
+    img.hidden = !src;
+    img.classList.toggle('logo-cliente', wl && !!src);
+    img.alt = wl ? (marca.nome || '') : 'Zilado Pay';
+    if (src && img.getAttribute('src') !== src) {
+      img.onerror = () => { img.hidden = true; }; // logo fora do ar: some, não fica o ícone quebrado
+      img.src = src;
+    }
+  });
+  document.title = wl ? (marca.nome || 'Autoatendimento') : 'Zilado Pay';
+  FRASE_PADRAO = wl ? FRASE_WHITELABEL : FRASE_ZILADO;
+  // O tema pode usar o logo do cliente (com ou sem marca branca), ex.: Mr Cold na tela inicial.
+  if (tema && tema.logoEmpresa) tema.logoEmpresa(marca.logo_url);
+}
+function marcaGuardada() {
+  try { return JSON.parse(localStorage.getItem(CHAVE_MARCA)) || null; } catch (_) { return null; }
+}
+
+/* =====================================================================
    TELA INICIAL PERSONALIZADA (painel > ponto de venda > Tela inicial do totem)
    ===================================================================== */
-const FRASE_PADRAO = 'Pediu, pagou,\nzilou.';
+const FRASE_ZILADO = 'Pediu, pagou,\nzilou.';
+const FRASE_WHITELABEL = 'Escolha, pague\ne retire.';
+let FRASE_PADRAO = FRASE_ZILADO;
 let fundoPedido = null, fundoAplicado = null;
 function aplicarInicio(home) {
   home = home || {};
   const ini = $('inicio');
-  $('frase').textContent = home.title || FRASE_PADRAO; // texto puro: o \n vira quebra pelo white-space:pre-line
+  $('frase').textContent = home.title || (tema && tema.frase) || FRASE_PADRAO; // texto puro: o \n vira quebra pelo white-space:pre-line
   const cor = /^#[0-9A-Fa-f]{6}$/.test(home.text_color || '') ? home.text_color : null;
   if (cor) ini.style.setProperty('--txt-inicio', cor); else ini.style.removeProperty('--txt-inicio');
   ini.classList.toggle('cor-propria', !!cor);
@@ -685,12 +885,31 @@ function bloqueadoAgora(r) {
   desenharCardapio();
   avisarBloqueio();
 }
+// Telas do operador (PIN e Diagnóstico): nada do totem tira o operador delas.
+// Sem isso, com o servidor fora, a nova tentativa jogava de volta para "Sem conexão"
+// no meio da digitação do PIN, e não dava para entrar no Diagnóstico nem sair do app.
+const TELAS_OPERADOR = ['pin', 'admin'];
+const operadorNaTela = () => TELAS_OPERADOR.includes(telaAtual());
+// Servidor fora: tenta de novo em 5 s, 10 s, 20 s e depois a cada 30 s (zera quando volta).
+// Dá para forçar pelo botão "Tentar agora", e a internet voltando no aparelho já dispara uma tentativa.
+let tentativasRetry = 0, conferindo = false;
 function indisponivel(titulo, detalhe, retryMs) {
   $('indisponivelTitulo').textContent = titulo; $('indisponivelDetalhe').textContent = detalhe;
-  $('indisponivelRetry').textContent = 'Tentando de novo em instantes...';
-  ir('indisponivel');
-  clearTimeout(timerRetry); timerRetry = setTimeout(carregar, retryMs || 10000);
+  const atraso = retryMs || Math.min(5000 * 2 ** tentativasRetry++, 30000);
+  $('indisponivelRetry').textContent = 'Tentando de novo em ' + Math.round(atraso / 1000) + ' s...';
+  // Operador no PIN ou no Diagnóstico: a tela fica guardada para quando ele voltar.
+  if (operadorNaTela()) telaAntes = 'indisponivel'; else ir('indisponivel');
+  $('btnTentarAgora').disabled = false;
+  clearTimeout(timerRetry); timerRetry = setTimeout(carregar, atraso);
 }
+async function tentarAgora() {
+  if (conferindo) return;
+  conferindo = true; clearTimeout(timerRetry); tentativasRetry = 0;
+  $('btnTentarAgora').disabled = true; $('indisponivelRetry').textContent = 'Conferindo...';
+  try { await carregar(); } finally { conferindo = false; $('btnTentarAgora').disabled = false; }
+}
+// Wi-Fi ou dados voltaram: tenta na hora, sem esperar o próximo intervalo.
+window.addEventListener('online', () => { if (telaAtual() === 'indisponivel') tentarAgora(); });
 
 /* ---------- Pareamento ---------- */
 const TAM_CODIGO = 8;
@@ -738,14 +957,251 @@ async function parear() {
 /* =====================================================================
    CARDÁPIO
    ===================================================================== */
-async function comecar() {
+/* ---------- Formulário de leads ----------
+   Painel > Clientes > Formulários; o ponto de venda escolhe qual mostrar. Aparece depois
+   da tela inicial e antes do cardápio. "Obrigatório" tira o botão Pular. As respostas vão
+   para POST /leads; sem rede, ficam numa fila no aparelho e o cliente segue comprando. */
+const formularioAtivo = () => { const f = loja && loja.store.lead_form; return f && Array.isArray(f.questions) && f.questions.length ? f : null; };
+const soDigitos = t => String(t || '').replace(/\D/g, '');
+function mascaraTelefone(t) {
+  const d = soDigitos(t).slice(0, 11);
+  if (d.length <= 2) return d.length ? '(' + d : '';
+  if (d.length <= 6) return `(${d.slice(0, 2)}) ${d.slice(2)}`;
+  if (d.length <= 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`;
+  return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
+}
+function mascaraData(t) {
+  const d = soDigitos(t).slice(0, 8);
+  return d.length <= 2 ? d : d.length <= 4 ? `${d.slice(0, 2)}/${d.slice(2)}` : `${d.slice(0, 2)}/${d.slice(2, 4)}/${d.slice(4)}`;
+}
+function dataValida(t) {
+  const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(t); if (!m) return false;
+  const [d, mes, a] = [+m[1], +m[2], +m[3]], dt = new Date(a, mes - 1, d);
+  if (dt.getFullYear() !== a || dt.getMonth() !== mes - 1 || dt.getDate() !== d) return false; // 31/02
+  const hoje = new Date();
+  return dt <= hoje && a >= hoje.getFullYear() - 120;
+}
+/** Confere uma resposta como o servidor confere. Devolve a mensagem de erro ou ''. */
+function conferirResposta(q, v) {
+  if (v === '' || v == null) return q.required ? 'Responda esta pergunta.' : '';
+  switch (q.type) {
+    case 'phone': { const d = soDigitos(v); return [10, 11].includes(d.length) && d[0] !== '0' ? '' : 'Informe o telefone com DDD.'; }
+    case 'email': return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v) ? '' : 'E-mail inválido.';
+    case 'birthdate': return dataValida(v) ? '' : 'Data inválida. Use DD/MM/AAAA.';
+    case 'number': return /^-?\d+([.,]\d+)?$/.test(v) ? '' : 'Informe um número.';
+    case 'choice': return (q.options || []).includes(v) ? '' : 'Escolha uma opção.';
+    default: return v.length > 255 ? 'Resposta longa demais.' : '';
+  }
+}
+let respostas = {};
+function abrirFormulario() {
+  const f = formularioAtivo();
+  respostas = {};
+  $('formTitulo').textContent = f.title;
+  $('formIntro').textContent = f.intro || ''; $('formIntro').hidden = !f.intro;
+  $('formPular').textContent = f.required ? 'Cancelar' : 'Pular';
+  $('formEnviar').disabled = false; $('formEnviar').textContent = 'Continuar';
+  const caixa = $('formPerguntas'); caixa.textContent = '';
+  for (const q of f.questions) {
+    const erro = el('span', {class: 'erro-campo', hidden: ''});
+    // <label> só em volta de campo de texto: em volta de botões, tocar no texto da pergunta escolheria a 1ª opção.
+    const bloco = el(q.type === 'choice' ? 'div' : 'label', {class: 'pergunta', 'data-q': q.id}, el('span', {}, q.label, q.required ? el('i', {}, ' *') : null));
+    if (q.type === 'choice') {
+      const opcoes = el('div', {class: 'opcoes'});
+      for (const o of q.options || []) {
+        opcoes.append(el('button', {type: 'button', onclick: e => {
+          respostas[q.id] = respostas[q.id] === o ? '' : o;
+          opcoes.querySelectorAll('button').forEach(b => b.classList.toggle('sel', b.textContent === respostas[q.id]));
+          limparErro(bloco);
+        }}, o));
+      }
+      bloco.append(opcoes);
+    } else {
+      const tipos = {phone: ['tel', 'tel', '(00) 00000-0000'], email: ['email', 'email', 'seu@email.com'], birthdate: ['text', 'numeric', 'DD/MM/AAAA'], number: ['text', 'decimal', ''], name: ['text', 'text', ''], text: ['text', 'text', '']};
+      const [type, mode, ph] = tipos[q.type] || tipos.text;
+      const input = el('input', {type, inputmode: mode, placeholder: ph, autocomplete: 'off', autocapitalize: q.type === 'name' ? 'words' : 'sentences', maxlength: '255'});
+      if (q.type === 'email') input.setAttribute('autocapitalize', 'none');
+      input.addEventListener('input', () => {
+        if (q.type === 'phone') input.value = mascaraTelefone(input.value);
+        if (q.type === 'birthdate') input.value = mascaraData(input.value);
+        respostas[q.id] = input.value.trim();
+        limparErro(bloco);
+      });
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); const prox = [...caixa.querySelectorAll('input[type]:not([type=checkbox])')]; const i = prox.indexOf(input); (prox[i + 1] || input).focus(); if (i === prox.length - 1) input.blur(); } });
+      bloco.append(input);
+    }
+    bloco.append(erro);
+    caixa.append(bloco);
+  }
+  if (f.consent_text) {
+    const caixaAceite = el('input', {type: 'checkbox', id: 'formAceite', onchange: () => $('formAceiteBloco').classList.remove('invalida')});
+    caixa.append(el('label', {class: 'aceite', id: 'formAceiteBloco'}, caixaAceite, el('span', {}, f.consent_text)));
+  }
+  caixa.scrollTop = 0;
+  if (tema && tema.formulario) tema.formulario(f);
+  ir('formulario');
+}
+function limparErro(bloco) { bloco.classList.remove('invalida'); const e = bloco.querySelector('.erro-campo'); e.hidden = true; e.textContent = ''; }
+function marcarErro(id, msg) {
+  const bloco = $('formPerguntas').querySelector(`[data-q="${id}"]`); if (!bloco) return null;
+  bloco.classList.add('invalida'); const e = bloco.querySelector('.erro-campo'); e.textContent = msg; e.hidden = false;
+  return bloco;
+}
+async function enviarFormulario() {
+  const f = formularioAtivo(); if (!f) return irAoCardapio();
+  let primeiro = null;
+  for (const q of f.questions) {
+    const msg = conferirResposta(q, respostas[q.id] || '');
+    if (msg) { const b = marcarErro(q.id, msg); primeiro = primeiro || b; } // marca todas, rola até a primeira
+  }
+  const aceite = $('formAceite');
+  if (aceite && !aceite.checked) { $('formAceiteBloco').classList.add('invalida'); primeiro = primeiro || $('formAceiteBloco'); }
+  if (primeiro) return primeiro.scrollIntoView({block: 'center', behavior: 'smooth'});
+
+  const answers = {};
+  for (const q of f.questions) if (respostas[q.id]) answers[q.id] = respostas[q.id];
+  const item = {uuid: uuid(), answers, consent: !!(aceite && aceite.checked)};
+  $('formEnviar').disabled = true; $('formEnviar').textContent = 'Enviando...';
+  const r = await api('POST', '/leads', item).catch(() => ({status: 401}));
+  $('formEnviar').disabled = false; $('formEnviar').textContent = 'Continuar';
+  if (r.status === 401) return; // já foi para o pareamento
+  if (r.status === 422) {
+    const erros = (r.dados && r.dados.errors) || {};
+    // O formulário mudou ou foi desligado no painel enquanto o cliente respondia.
+    if (erros.form) { formRespondido = true; await carregar(); return irAoCardapio(); }
+    let marcado = null;
+    for (const [campo, msgs] of Object.entries(erros)) {
+      const m = /^answers\.(\d+)$/.exec(campo);
+      if (m) { const b = marcarErro(m[1], msgs[0]); marcado = marcado || b; }
+      else if (campo === 'consent' && $('formAceiteBloco')) { $('formAceiteBloco').classList.add('invalida'); marcado = marcado || $('formAceiteBloco'); }
+    }
+    if (marcado) return marcado.scrollIntoView({block: 'center', behavior: 'smooth'});
+    await carregar(); if (formularioAtivo()) return abrirFormulario();
+    formRespondido = true; return irAoCardapio();
+  }
+  // Sem rede ou servidor com problema: guarda no aparelho e manda depois. O cliente segue.
+  if (!r.ok) gravarFilaLeads([...lerFilaLeads(), item]);
+  leadUuid = item.uuid; formRespondido = true;
+  irAoCardapio();
+}
+function pularFormulario() {
+  const f = formularioAtivo();
+  if (f && f.required) return reiniciar(); // obrigatório: "Cancelar" volta ao início
+  formRespondido = true; irAoCardapio();
+}
+function irAoCardapio() {
+  ir('cardapio');
+  if (Date.now() - cardapioEm > 60000) carregar();
+}
+const CHAVE_FILA_LEADS = 'totem.leads';
+const lerFilaLeads = () => { try { return JSON.parse(localStorage.getItem(CHAVE_FILA_LEADS)) || []; } catch (_) { return []; } };
+const gravarFilaLeads = f => localStorage.setItem(CHAVE_FILA_LEADS, JSON.stringify(f));
+let enviandoLeads = false;
+async function enviarLeadsPendentes() {
+  if (enviandoLeads) return; enviandoLeads = true;
+  try {
+    for (const item of lerFilaLeads()) {
+      const r = await api('POST', '/leads', item);
+      // Aceito, ou recusado de vez (o formulário mudou): sai da fila. Sem rede: tenta depois.
+      if (r.ok || (r.status >= 400 && r.status < 500 && r.status !== 429)) {
+        if (!r.ok) log('formulário recusado pelo servidor', {uuid: item.uuid, status: r.status, corpo: r.dados});
+        gravarFilaLeads(lerFilaLeads().filter(i => i.uuid !== item.uuid));
+      } else break;
+    }
+  } catch (_) { /* 401 */ } finally { enviandoLeads = false; }
+}
+setInterval(enviarLeadsPendentes, 30000);
+
+/* ---------- Avaliação de atendimento (1 a 5 estrelas) ----------
+   Painel > ponto de venda > Avaliação de atendimento. Aparece na tela de pagamento aprovado;
+   tocar numa estrela já envia (tocar em outra troca a nota). Quem não quiser, toca em Concluir.
+   No cartão o pagamento pode ainda estar na fila de envio: a nota espera ele chegar ao servidor. */
+const CHAVE_FILA_AVAL = 'totem.avaliacoes';
+const lerFilaAval = () => { try { return JSON.parse(localStorage.getItem(CHAVE_FILA_AVAL)) || []; } catch (_) { return []; } };
+const gravarFilaAval = f => localStorage.setItem(CHAVE_FILA_AVAL, JSON.stringify(f));
+function mostrarAvaliacao(p) {
+  const r = loja && loja.store.rating;
+  if (!r || !p || !p.uuid) return;
+  $('avalPergunta').textContent = r.question;
+  $('avalObrigado').textContent = '';
+  const caixa = $('avalEstrelas'); caixa.textContent = '';
+  for (let n = 1; n <= 5; n++) {
+    caixa.append(el('button', {type: 'button', role: 'radio', 'aria-label': n + (n === 1 ? ' estrela' : ' estrelas'),
+      onclick: () => avaliar(p.uuid, n)}, '★'));
+  }
+  $('avaliacao').hidden = false;
+}
+function avaliar(uuidPedido, estrelas) {
+  [...$('avalEstrelas').children].forEach((b, i) => { b.classList.toggle('cheia', i < estrelas); b.setAttribute('aria-checked', String(i + 1 === estrelas)); });
+  $('avalObrigado').textContent = 'Obrigado pela avaliação!';
+  gravarFilaAval([...lerFilaAval().filter(a => a.uuid !== uuidPedido), {uuid: uuidPedido, stars: estrelas}]);
+  enviarAvaliacoes();
+}
+let enviandoAval = false, reenviarAval = false;
+async function enviarAvaliacoes() {
+  if (enviandoAval) { reenviarAval = true; return; } // nota trocada no meio do envio: manda de novo ao terminar
+  enviandoAval = true;
+  try {
+    await enviarPendentes(); // pagamento de cartão primeiro: só pedido pago pode ser avaliado
+    const pagamentosNaFila = new Set(lerFila().map(i => i.uuid));
+    for (const item of lerFilaAval()) {
+      if (pagamentosNaFila.has(item.uuid)) continue; // ainda não chegou ao servidor: tenta depois
+      const r = await api('POST', `/orders/${item.uuid}/rating`, {stars: item.stars});
+      // Aceita, ou recusada de vez (avaliação desligada, pedido não pago): sai da fila.
+      if (r.ok || (r.status >= 400 && r.status < 500 && r.status !== 429)) {
+        if (!r.ok) log('avaliação recusada pelo servidor', {uuid: item.uuid, status: r.status, corpo: r.dados});
+        // Só tira se for a mesma nota: o cliente pode ter trocado enquanto esta ia.
+        gravarFilaAval(lerFilaAval().filter(a => !(a.uuid === item.uuid && a.stars === item.stars)));
+      } else break;
+    }
+  } catch (_) { /* 401 */ } finally { enviandoAval = false; }
+  if (reenviarAval) { reenviarAval = false; enviarAvaliacoes(); }
+}
+setInterval(enviarAvaliacoes, 30000);
+
+/* ---------- Comer aqui ou levar (painel > ponto de venda > Tela inicial do totem) ---------- */
+const opcoesEntrega = () => {
+  const f = loja && loja.store.fulfillment;
+  return f && f.ask && Array.isArray(f.options) && f.options.length ? f.options : null;
+};
+const rotuloEntrega = valor => ((opcoesEntrega() || []).find(o => o.value === valor) || {}).label || '';
+let assinaturaBotoes = null;
+function desenharBotoesInicio() {
+  const opcoes = opcoesEntrega(), chave = JSON.stringify(opcoes);
+  if (chave === assinaturaBotoes) return; // nada mudou: não refaz (o /me roda a cada minuto)
+  assinaturaBotoes = chave;
+  const caixa = $('botoesInicio'); caixa.textContent = '';
+  if (!opcoes) { caixa.append(el('button', {class: 'toque', onclick: () => comecar()}, 'Toque para começar')); return; }
+  const grade = el('div', {class: 'opcoes-entrega'});
+  // O tema pode pôr um desenho no botão (ex.: copinho para "comer aqui", sacola para "levar").
+  opcoes.forEach((o, i) => grade.append(el('button', {class: 'toque' + (i ? ' sec' : ''), onclick: () => comecar(o.value)},
+    tema && tema.iconeEntrega ? tema.iconeEntrega(o.value, i) : null, el('span', {}, o.label))));
+  caixa.append(grade);
+}
+function mostrarEntrega() {
+  const chip = $('chipEntrega');
+  chip.hidden = !entrega;
+  if (entrega) chip.textContent = rotuloEntrega(entrega) + ' · trocar';
+}
+/** Toque no aviso do cardápio: troca entre as duas opções sem perder o carrinho. */
+function trocarEntrega() {
+  const opcoes = opcoesEntrega(); if (!opcoes || !entrega) return;
+  const i = opcoes.findIndex(o => o.value === entrega);
+  entrega = opcoes[(i + 1) % opcoes.length].value;
+  mostrarEntrega();
+}
+
+async function comecar(tipo) {
   if (bloqueio) return avisarBloqueio();
   if (faltaImpressora()) return avisarFaltaImpressora();
-  ir('cardapio');
+  entrega = opcoesEntrega() ? (tipo || null) : null;
+  mostrarEntrega();
+  if (formularioAtivo() && !formRespondido) abrirFormulario(); else ir('cardapio');
   // Preço ou produto pode ter mudado no painel desde a última vez.
   if (Date.now() - cardapioEm > 60000) carregar();
 }
 function desenharCardapio() {
+  if (tema && tema.desenharCardapio) return tema.desenharCardapio();
   const lista = $('lista'); const rolagem = lista.scrollTop; lista.textContent = '';
   if (!produtos().length) lista.append(el('div', {class:'aviso'}, 'Este totem ainda não tem produtos no cardápio.'));
   for (const c of categorias) {
@@ -757,15 +1213,20 @@ function desenharCardapio() {
         const img = el('img', {src: p.image_url, alt: ''});
         img.onload = () => { foto.textContent = ''; foto.append(img); };
       }
-      grade.append(el('div', {class:'item'}, foto,
+      const q = carrinho.get(p.id) || 0;
+      // Fora do pedido: botão "Adicionar". No pedido: − quantidade +.
+      const controle = q
+        ? el('div', {class:'qtd'},
+            el('button', {onclick: () => alterar(p.id, -1), 'aria-label': 'Menos ' + p.name}, '−'),
+            el('span', {}, String(q)),
+            Object.assign(el('button', {onclick: () => alterar(p.id, 1), 'aria-label': 'Mais ' + p.name}, '+'), {disabled: !podeMais(p)}))
+        : Object.assign(el('button', {class:'adicionar', onclick: () => alterar(p.id, 1)}, '+ Adicionar'), {disabled: !podeMais(p)});
+      grade.append(el('div', {class:'item' + (q ? ' no-pedido' : '')}, foto,
         el('div', {class:'texto'},
           el('div', {class:'nome'}, p.name),
           p.description ? el('div', {class:'desc'}, p.description) : null,
-          el('div', {class:'preco'}, brl(p.price_cents))),
-        el('div', {class:'qtd'},
-          el('button', {onclick: () => alterar(p.id, -1), 'aria-label': 'Menos ' + p.name}, '−'),
-          el('span', {}, String(carrinho.get(p.id) || 0)),
-          el('button', {onclick: () => alterar(p.id, 1), 'aria-label': 'Mais ' + p.name}, '+'))));
+          seloRestam(p),
+          el('div', {class:'base'}, el('div', {class:'preco'}, brl(p.price_cents)), controle))));
     }
     lista.append(grade);
   }
@@ -774,7 +1235,8 @@ function desenharCardapio() {
   $('btnPagar').disabled = total() <= 0;
 }
 function alterar(id, d) {
-  const q = Math.max(0, Math.min(99, (carrinho.get(id) || 0) + d));
+  const p = produtos().find(x => x.id === id);
+  const q = Math.max(0, Math.min(p ? limiteDe(p) : MAX_POR_ITEM, (carrinho.get(id) || 0) + d));
   if (q) carrinho.set(id, q); else carrinho.delete(id);
   desenharCardapio();
 }
@@ -783,12 +1245,22 @@ function alterar(id, d) {
    PEDIDO
    ===================================================================== */
 function irParaPagamento() {
+  // NFC-e "sob solicitação": pergunta uma vez por pedido, antes da forma de pagamento.
+  if (modoFiscal() === 'on_request' && nota === null) return perguntarNota();
+  $('notaEscolhida').hidden = modoFiscal() !== 'on_request';
+  if (nota) $('notaEscolhida').textContent = 'Nota fiscal: ' + (!nota.requested ? 'não' : nota.cpf ? 'CPF ' + mascaraCpf(nota.cpf) : 'sem CPF') + ' · alterar';
   const formas = (loja && loja.store.payment_methods) || {};
   const caixa = $('opcoesFormas'); caixa.textContent = '';
   const opcao = (icone, titulo, sub, acao) => caixa.append(
     el('button', {class:'forma', onclick: acao}, icone, el('span', {}, titulo, el('small', {}, sub))));
-  if (formas.pix) opcao('⚡', 'Pix', 'QR Code na tela', pagarPix);
-  if (formas.card) {
+  const fluxo = fluxoPagamento();
+  if (formas.pix) fluxo.pix === 'terminal'
+    ? opcao('⚡', 'Pix', 'QR Code na maquininha', () => pagarNaMaquininha('pix'))
+    : opcao('⚡', 'Pix', 'QR Code na tela', pagarPix);
+  if (formas.card && fluxo.card === 'terminal') {
+    opcao('💳', 'Crédito', 'à vista, na maquininha ao lado', () => pagarNaMaquininha('credit'));
+    opcao('🏧', 'Débito', 'com senha, na maquininha ao lado', () => pagarNaMaquininha('debit'));
+  } else if (formas.card) {
     opcao('💳', 'Crédito', 'à vista, na maquininha', () => pagarCartao('CREDITO'));
     opcao('🏧', 'Débito', 'com senha, na maquininha', () => pagarCartao('DEBITO'));
   }
@@ -798,32 +1270,109 @@ function irParaPagamento() {
   ir('formas');
 }
 
+/* ---------- Nota fiscal (NFC-e) ----------
+   loja.fiscal.mode: "always" (toda venda tem nota, sem pergunta), "on_request" (pergunta
+   aqui, com CPF opcional) ou "off". A nota é emitida pelo servidor depois do pagamento. */
+const modoFiscal = () => (loja && loja.fiscal && loja.fiscal.mode) || 'off';
+/** A venda vai ter nota? (decide se espera a nota antes de imprimir) */
+const vendaComNota = () => modoFiscal() === 'always' || (modoFiscal() === 'on_request' && !!nota && nota.requested);
+const mascaraCpf = c => c.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, '$1.$2.$3-$4');
+let cpf = '';
+function perguntarNota() {
+  $('notaPergunta').hidden = false; $('notaCpf').hidden = true; $('notaVoltar').hidden = false;
+  ir('nota');
+}
+function escolherNota(quer, numero) {
+  nota = {requested: quer, cpf: quer ? numero : null};
+  irParaPagamento();
+}
+function abrirCpf() {
+  cpf = ''; desenharCpf();
+  $('notaPergunta').hidden = true; $('notaCpf').hidden = false; $('notaVoltar').hidden = true;
+}
+function voltarPerguntaNota() { perguntarNota(); }
+function desenharCpf() {
+  const t = cpf.padEnd(11, '_');
+  $('cpfDigitado').textContent = `${t.slice(0, 3)}.${t.slice(3, 6)}.${t.slice(6, 9)}-${t.slice(9)}`;
+  $('cpfDigitado').classList.remove('invalido'); $('cpfErro').hidden = true;
+  $('btnCpf').disabled = cpf.length !== 11;
+}
+function teclaCpf(t) {
+  if (t === '⌫') cpf = cpf.slice(0, -1);
+  else if (cpf.length < 11) cpf += t;
+  desenharCpf();
+}
+['1','2','3','4','5','6','7','8','9','','0','⌫'].forEach(t =>
+  $('tecladoCpf').append(t ? el('button', {onclick: () => teclaCpf(t)}, t) : el('span')));
+/** Mesma conta do servidor (dígitos verificadores): CPF errado nem sai do totem. */
+function cpfValido(c) {
+  if (!/^\d{11}$/.test(c) || /^(\d)\1{10}$/.test(c)) return false;
+  for (const pos of [9, 10]) {
+    let soma = 0;
+    for (let i = 0; i < pos; i++) soma += Number(c[i]) * (pos + 1 - i);
+    if (((soma * 10) % 11) % 10 !== Number(c[pos])) return false;
+  }
+  return true;
+}
+function confirmarCpf() {
+  if (!cpfValido(cpf)) {
+    $('cpfDigitado').classList.add('invalido'); $('cpfErro').hidden = false;
+    $('cpfErro').textContent = 'CPF inválido. Confira os números.';
+    return;
+  }
+  escolherNota(true, cpf);
+}
+
 /** Garante que existe no servidor um pedido pendente igual ao carrinho. Devolve o pedido ou null (com a tela de erro já aberta). */
 async function garantirPedido() {
-  const atual = assinatura();
+  // Trocar "comer aqui/levar" depois de ir ao pagamento também gera outro pedido.
+  const atual = assinatura() + '|' + (entrega || '') + '|' + (nota ? JSON.stringify(nota) : '');
   if (pedido && pedido.assinatura === atual && pedido.status === 'pending') return pedido;
   // O carrinho mudou depois de um pedido criado: o antigo é cancelado.
   if (pedido && pedido.status === 'pending') api('POST', `/orders/${pedido.uuid}/cancel`).catch(() => {});
   pedido = null;
   // Mesmo uuid se a criação for repetida (ex.: a rede caiu): o servidor não duplica.
   if (!tentativa || tentativa.assinatura !== atual) tentativa = {uuid: uuid(), assinatura: atual};
+  // Formulário que ficou na fila (sem rede): tenta mandar antes, para o pedido sair ligado ao cliente.
+  if (leadUuid && lerFilaLeads().length) await enviarLeadsPendentes();
   const r = await api('POST', '/orders', {
     uuid: tentativa.uuid,
-    items: JSON.parse(atual).map(([id, q]) => ({product_id: id, quantity: q})),
+    items: JSON.parse(assinatura()).map(([id, q]) => ({product_id: id, quantity: q})),
+    ...(entrega ? {fulfillment: entrega} : {}),
+    ...(leadUuid ? {lead_uuid: leadUuid} : {}),
+    ...(modoFiscal() === 'on_request' && nota ? {invoice: nota} : {}),
   });
   if (r.ok) { guardarPedido(r.dados.data); pedido.assinatura = atual; return pedido; }
   if (r.status === 423) { bloqueadoAgora(r); return null; }
-  if (r.status === 422) { await carregar(); falha('Algum item saiu do cardápio', 'Confira seu pedido e tente de novo.', [['Ver cardápio', () => ir('cardapio')]]); }
+  if (semEstoque(r)) { await acabouEstoque(r); return null; }
+  // A loja passou a perguntar "comer aqui ou levar" depois que este totem leu a configuração.
+  if (r.status === 422 && r.dados && r.dados.errors && r.dados.errors.fulfillment) {
+    await carregar();
+    falha('Comer aqui ou levar?', 'Escolha uma das opções para continuar.', (opcoesEntrega() || []).map(o => [o.label, () => { entrega = o.value; mostrarEntrega(); irParaPagamento(); }]));
+  }
+  else if (r.status === 422) { await carregar(); falha('Algum item saiu do cardápio', 'Confira seu pedido e tente de novo.', [['Ver cardápio', () => ir('cardapio')]]); }
   else falha('Não foi possível registrar o pedido', r.status ? (r.mensagem || 'Erro ' + r.status) : 'Sem conexão com o servidor.', [['Tentar de novo', irParaPagamento], ['Cancelar pedido', reiniciar, 'sec']]);
   return null;
+}
+/** 422 com code "out_of_stock": outro cliente levou as últimas unidades enquanto este escolhia. */
+const semEstoque = r => r.status === 422 && r.dados && r.dados.code === 'out_of_stock';
+async function acabouEstoque(r) {
+  // O pedido que perdeu a reserva (caso do Pix) é desfeito; o carrinho fica, ajustado ao que sobrou.
+  if (pedido && pedido.status === 'pending') api('POST', `/orders/${pedido.uuid}/cancel`).catch(() => {});
+  pedido = null; tentativa = null;
+  await carregar();
+  ajustarCarrinhoAoEstoque(); desenharCardapio();
+  falha('Acabou o estoque', (r.mensagem || 'Um dos itens acabou.') + ' Ajustamos o seu pedido.',
+    [['Ver pedido', () => ir('cardapio')], ['Cancelar pedido', reiniciar, 'sec']]);
 }
 function guardarPedido(dados) { pedido = Object.assign({assinatura: pedido && pedido.assinatura}, dados); }
 
 /** Volta ao início. Pedido que ficou pendente é cancelado no servidor. */
 function reiniciar() {
-  pararPix();
+  pararPix(); pararMaquininha(); maquininha = null; esquecerCobrancaMaq();
   if (pedido && pedido.status === 'pending') api('POST', `/orders/${pedido.uuid}/cancel`).catch(() => {});
-  pedido = null; tentativa = null; cartao = null; carrinho.clear();
+  pedido = null; tentativa = null; cartao = null; carrinho.clear(); entrega = null; nota = null;
+  leadUuid = null; formRespondido = false;
   desenharCardapio();
   if (loja) ir('inicio'); else iniciar();
 }
@@ -841,6 +1390,7 @@ async function pagarPix() {
     r = await api('POST', `/orders/${pedido.uuid}/pix`);
   } catch (_) { return; }
   if (r.status === 423) return bloqueadoAgora(r);
+  if (semEstoque(r)) return acabouEstoque(r);
   if (!r.ok) return falha('Não foi possível gerar o Pix',
     r.status ? (r.mensagem || 'Erro ' + r.status) : 'Sem conexão com o servidor.',
     [['Tentar de novo', pagarPix], ['Outra forma de pagamento', irParaPagamento, 'sec']]);
@@ -906,6 +1456,186 @@ function desenharQr(alvo, texto) {
   for (let l = 0; l < n; l++) for (let c = 0; c < n; c++) if (qr.isDark(l, c)) d += `M${c + margem} ${l + margem}h1v1h-1z`;
   alvo.innerHTML = `<svg viewBox="0 0 ${lado} ${lado}" shape-rendering="crispEdges" role="img" aria-label="QR Code do Pix">`
     + `<rect width="${lado}" height="${lado}" fill="#fff"/><path d="${d}" fill="#000"/></svg>`;
+}
+
+/* =====================================================================
+   MAQUININHA INTEGRADA (Mercado Pago Point)
+   O servidor manda a cobrança para a maquininha deste totem; o totem só acompanha
+   o pedido (GET /orders/{uuid}) e imprime quando ele fica pago. Contrato em
+   docs/api-totem.md, "Fluxo de uma venda na maquininha".
+   ===================================================================== */
+/** Por onde cobrar (GET /me -> store.payment_flow). Servidor antigo, sem o campo: leitor e Pix na tela. */
+const fluxoPagamento = () => Object.assign({card: 'reader', pix: 'screen', pix_screen_fallback: false},
+  (loja && loja.store.payment_flow) || {});
+const ROTULO_METODO = {credit: 'crédito', debit: 'débito', voucher: 'voucher', pix: 'Pix'};
+const FORMA_COMPROVANTE = {credit: 'Cartao de credito', debit: 'Cartao de debito', voucher: 'Voucher', pix: 'Pix'};
+let maquininha = null;            // {metodo, paymentId, desistindo}
+let timerMaq = null, timerMaqRelogio = null, consultandoMaq = false;
+
+/** Cobrança da maquininha mais recente do pedido (qualquer situação). */
+const cobrancaMaq = () => pedido && maquininha && maquininha.paymentId
+  ? pedido.payments.find(p => p.id === maquininha.paymentId) : null;
+
+async function pagarNaMaquininha(metodo) {
+  espera(metodo === 'pix' ? 'Gerando o Pix na maquininha...' : 'Enviando para a maquininha...');
+  let r;
+  try {
+    if (!await garantirPedido()) return;
+    r = await api('POST', `/orders/${pedido.uuid}/terminal`, {method: metodo});
+  } catch (_) { return; }
+  if (r.status === 423) return bloqueadoAgora(r);
+  if (semEstoque(r)) return acabouEstoque(r);
+  if (!r.ok) {
+    const acoes = [['Tentar de novo', () => pagarNaMaquininha(metodo)]];
+    // Pix na maquininha com reserva: QR Code na tela do totem.
+    if (metodo === 'pix' && fluxoPagamento().pix_screen_fallback) acoes.push(['Mostrar o QR Code na tela', pagarPix]);
+    acoes.push(['Outra forma de pagamento', irParaPagamento, 'sec']);
+    return falha('Não deu para cobrar na maquininha',
+      r.status ? (r.mensagem || 'Erro ' + r.status) : 'Sem conexão com o servidor.', acoes);
+  }
+  guardarPedido(r.dados.data);
+  const pg = pedido.payments.find(p => p.status === 'pending' && p.terminal);
+  if (!pg) return aoMudarMaquininha(); // já pago (ou recusado) entre uma chamada e outra
+  maquininha = {metodo: pg.method || metodo, paymentId: pg.id, desistindo: false};
+  mostrarMaquininha();
+}
+function mostrarMaquininha() {
+  const pg = cobrancaMaq();
+  if (!pg) return;
+  guardarCobrancaMaq();
+  const pix = maquininha.metodo === 'pix';
+  $('maqIcone').textContent = pix ? '⚡' : '💳';
+  $('maqTitulo').textContent = pix ? 'Pague com Pix na maquininha' : 'Pague na maquininha';
+  $('maqValor').textContent = brl(pg.amount_cents);
+  $('maqForma').textContent = pix ? 'O QR Code aparece na tela da maquininha' : 'Cartão de ' + (ROTULO_METODO[maquininha.metodo] || 'crédito ou débito');
+  $('btnCancelarMaq').disabled = false;
+  passoMaquininha(pg);
+  ir('maquininha');
+  pararMaquininha();
+  const fim = pg.terminal && pg.terminal.expires_at ? new Date(pg.terminal.expires_at).getTime() : 0;
+  const relogio = () => {
+    const s = fim ? Math.max(0, Math.round((fim - Date.now()) / 1000)) : 0;
+    $('maqRelogio').textContent = fim ? String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0') : '--:--';
+  };
+  relogio(); timerMaqRelogio = setInterval(relogio, 1000);
+  timerMaq = setInterval(acompanharMaquininha, 2000);
+}
+/** Texto do passo atual, pela situação da cobrança na maquininha. */
+function passoMaquininha(pg) {
+  const situacao = pg && pg.terminal ? pg.terminal.status : 'created';
+  const pix = maquininha && maquininha.metodo === 'pix';
+  let texto, alerta = false;
+  if (maquininha && maquininha.desistindo) { texto = 'Cancele a operação na tela da maquininha.'; alerta = true; }
+  else if (situacao === 'action_required' || situacao === 'check_on_terminal') { texto = 'Confira o resultado na tela da maquininha.'; alerta = true; }
+  else if (situacao === 'at_terminal') texto = pix ? 'Leia o QR Code na tela da maquininha com o app do seu banco.' : 'Aproxime, insira ou passe o cartão na maquininha.';
+  else texto = 'Enviando para a maquininha...';
+  $('maqPasso').textContent = texto;
+  $('maqPasso').classList.toggle('alerta', alerta);
+}
+function pararMaquininha() { clearInterval(timerMaq); clearInterval(timerMaqRelogio); timerMaq = timerMaqRelogio = null; }
+
+async function acompanharMaquininha() {
+  if (consultandoMaq || !pedido || !maquininha) return;
+  consultandoMaq = true;
+  try {
+    const r = await api('GET', `/orders/${pedido.uuid}`);
+    if (!timerMaq) return; // saiu da tela enquanto a consulta estava no ar
+    if (r.ok) { guardarPedido(r.dados.data); aoMudarMaquininha(); }
+    else $('maqPasso').textContent = 'Sem conexão. Tentando de novo...';
+  } catch (_) { /* 401: já foi para o pareamento */ } finally { consultandoMaq = false; }
+}
+/** Decide a tela a partir do pedido que veio do servidor. */
+function aoMudarMaquininha() {
+  const pg = cobrancaMaq();
+  if (pedido.status === 'paid') {
+    pararMaquininha(); esquecerCobrancaMaq();
+    const aprovado = pedido.payments.find(p => p.status === 'approved') || pg || {};
+    const m = maquininha; maquininha = null;
+    return sucesso(FORMA_COMPROVANTE[aprovado.method] || FORMA_COMPROVANTE[m && m.metodo] || 'Cartao');
+  }
+  if (!pg) return;
+  if (pg.status === 'pending') return passoMaquininha(pg);
+  pararMaquininha(); esquecerCobrancaMaq();
+  const m = maquininha;
+  // O cliente pediu para desistir e cancelou na maquininha: agora o pedido pode ser cancelado.
+  if (m.desistindo && pg.status === 'canceled') return cancelarMaquininha();
+  const acoes = [['Tentar de novo', () => pagarNaMaquininha(m.metodo)], ['Outra forma de pagamento', irParaPagamento, 'sec'], ['Cancelar pedido', reiniciar, 'sec']];
+  maquininha = null;
+  if (pg.status === 'declined') return falha('Pagamento recusado', pg.message || 'Tente de novo ou escolha outra forma de pagamento.', acoes);
+  falha(m.metodo === 'pix' ? 'O Pix não foi pago' : 'A cobrança foi cancelada', 'Nenhum valor foi cobrado.', acoes);
+}
+async function cancelarMaquininha() {
+  if (!pedido) return reiniciar();
+  $('btnCancelarMaq').disabled = true;
+  $('maqPasso').textContent = 'Cancelando...';
+  let r;
+  try { r = await api('POST', `/orders/${pedido.uuid}/cancel`); } catch (_) { return; }
+  if (r.ok) { pararMaquininha(); pedido = null; maquininha = null; return reiniciar(); }
+  // A maquininha já está com a cobrança: só cancelando nela. Continua acompanhando.
+  if (r.status === 409 && r.dados && r.dados.code === 'cancel_on_terminal') {
+    if (maquininha) maquininha.desistindo = true;
+    if (telaAtual() !== 'maquininha') mostrarMaquininha();
+    $('maqPasso').textContent = r.mensagem || 'Cancele a operação na tela da maquininha.';
+    $('maqPasso').classList.add('alerta');
+    if (!timerMaq) timerMaq = setInterval(acompanharMaquininha, 2000);
+    return;
+  }
+  // 409 sem código: o pagamento caiu um instante antes. Vale o que o servidor disser.
+  try {
+    const atual = await api('GET', `/orders/${pedido.uuid}`);
+    if (atual.ok) { guardarPedido(atual.dados.data); if (pedido.status === 'paid') { pararMaquininha(); return aoMudarMaquininha(); } }
+  } catch (_) { return; }
+  // Sem conexão para cancelar: a cobrança vence sozinha na maquininha.
+  pararMaquininha(); pedido = null; maquininha = null; reiniciar();
+}
+
+/* ---------- Retomar depois que o app fecha ----------
+   A cobrança aberta na maquininha fica guardada no aparelho. Se o app fechar ou o tablet
+   reiniciar no meio, ao abrir de novo o totem consulta o pedido e: pago -> imprime;
+   ainda na maquininha -> volta para a tela dela; recusado/cancelado -> mostra o resultado.
+   O carrinho volta junto, para "Tentar de novo" cobrar o mesmo pedido. */
+const CHAVE_MAQ = 'totem.cobrancaMaquininha';
+const VALIDADE_RETOMADA_MS = 30 * 60 * 1000;
+function guardarCobrancaMaq() {
+  if (!pedido || !maquininha) return;
+  try {
+    localStorage.setItem(CHAVE_MAQ, JSON.stringify({
+      uuid: pedido.uuid, assinatura: pedido.assinatura, metodo: maquininha.metodo, paymentId: maquininha.paymentId,
+      carrinho: [...carrinho], entrega, nota, leadUuid, em: Date.now(),
+    }));
+  } catch (_) { /* sem armazenamento: só não retoma */ }
+}
+function esquecerCobrancaMaq() { try { localStorage.removeItem(CHAVE_MAQ); } catch (_) {} }
+function lerCobrancaMaq() {
+  try {
+    const c = JSON.parse(localStorage.getItem(CHAVE_MAQ) || 'null');
+    return c && c.uuid && Date.now() - (c.em || 0) < VALIDADE_RETOMADA_MS ? c : null;
+  } catch (_) { return null; }
+}
+async function retomarMaquininha() {
+  const c = lerCobrancaMaq();
+  if (!c) { esquecerCobrancaMaq(); return; }
+  espera('Retomando o pagamento...', 'Consultando a maquininha');
+  let r;
+  try { r = await api('GET', `/orders/${c.uuid}`); } catch (_) { return; }
+  if (!r.ok) {
+    // Pedido de outra loja (totem pareado de novo) ou servidor fora: não insiste.
+    if (r.status === 404) esquecerCobrancaMaq();
+    return ir('inicio');
+  }
+  // Volta o cliente para onde estava.
+  carrinho.clear(); (c.carrinho || []).forEach(([id, q]) => carrinho.set(id, q));
+  entrega = c.entrega || null; nota = c.nota || null; leadUuid = c.leadUuid || null; formRespondido = true;
+  desenharCardapio(); mostrarEntrega();
+  pedido = null; guardarPedido(r.dados.data); pedido.assinatura = c.assinatura;
+  maquininha = {metodo: c.metodo, paymentId: c.paymentId, desistindo: false};
+  log('retomada', {pedido: pedido.code, situacao: pedido.status});
+  if (pedido.status === 'canceled' || pedido.status === 'refunded') { esquecerCobrancaMaq(); maquininha = null; return reiniciar(); }
+  const pg = cobrancaMaq();
+  if (pedido.status === 'pending' && pg && pg.status === 'pending') return mostrarMaquininha();
+  // Pendente sem a cobrança guardada (não deveria acontecer): volta para escolher a forma.
+  if (pedido.status === 'pending' && !pg) { esquecerCobrancaMaq(); maquininha = null; return irParaPagamento(); }
+  aoMudarMaquininha();
 }
 
 /* =====================================================================
@@ -991,22 +1721,68 @@ function resultado(ok, titulo, detalhe, senha, acoes) {
   $('tituloResultado').textContent = titulo; $('detalheResultado').textContent = detalhe;
   $('senha').hidden = !senha; $('senha').textContent = senha || '';
   botoesResultado(acoes);
+  $('avaliacao').hidden = true;
   prazoResultado = 15000;
   ir('resultado');
 }
 /** forma: como foi pago, para sair no comprovante ("Pix", "Cartao de credito"...). */
 function sucesso(forma) {
+  sucessoPedido(forma);
+  mostrarAvaliacao(pedido);
+}
+async function sucessoPedido(forma) {
   // Daqui em diante "reiniciar" não deve cancelar nada: o pedido está pago.
   pedido = Object.assign({}, pedido, {status: 'paid'});
   const pago = {pedido, forma: forma || 'Pix', quando: new Date()};
   guardarUltimaVenda(pago);
   const imprime = !!impressoraAtual();
+  // NFC-e: o servidor emite logo depois do pagamento. Espera alguns segundos para o DANFE
+  // sair no lugar do comprovante; sem resposta, imprime o comprovante comum e a nota
+  // fica no painel do estabelecimento.
+  if (vendaComNota()) {
+    resultado(true, 'Pagamento aprovado!', 'Emitindo a nota fiscal...', pedido.code, []);
+    prazoResultado = 0; armarInatividade('resultado');
+    const n = await notaDoServidor(pedido);
+    if (telaAtual() !== 'resultado' || !pedido || pedido.code !== pago.pedido.code) return;
+    pago.nota = n && n.status === 'authorized' ? n : null;
+    pago.notaPendente = !pago.nota && n !== null; // venda com nota, mas ela não saiu (ou não a tempo)
+    log('nfc-e', {pedido: pago.pedido.code, situacao: n ? n.status : n === null ? 'sem nota' : 'sem resposta'});
+    guardarUltimaVenda(pago); // a 2a via sai com o DANFE
+    const seguiu = seguirVenda(pago, imprime);
+    mostrarAvaliacao(pago.pedido); // a tela de resultado foi redesenhada
+    return seguiu;
+  }
+  return seguirVenda(pago, imprime);
+}
+/** Depois do pagamento (e da nota, se houver): fichas no modo evento ou o comprovante. */
+function seguirVenda(pago, imprime) {
   if (modoEvento()) {
     resultado(true, 'Pagamento aprovado!', 'Gerando suas fichas...', pedido.code, []);
     prazoResultado = 0; armarInatividade('resultado'); // não volta ao início enquanto as fichas não saem
     return emitirFichas(pago, imprime);
   }
   sucessoComum(pago, imprime);
+}
+/** A NFC-e do pedido, como o servidor vê. Espera até ela ter resposta (autorizada,
+    rejeitada, com erro) ou até o prazo. null = a venda não tem nota; undefined = não deu tempo. */
+async function notaDoServidor(p) {
+  if (p.invoice && p.invoice.status !== 'pending') return p.invoice;
+  let ultima;
+  const buscar = async () => {
+    for (let i = 0; i < 12; i++) {
+      await enviarPendentes(); // no cartão, o pagamento ainda pode estar na fila de envio
+      const r = await api('GET', `/orders/${p.uuid}`);
+      if (r.ok && r.dados.data.status === 'paid') {
+        const n = r.dados.data.invoice;
+        if (n === null || n === undefined) return null;
+        ultima = n;
+        if (n.status !== 'pending') return n;
+      }
+      await new Promise(ok => setTimeout(ok, 1500));
+    }
+    return ultima && ultima.status !== 'pending' ? ultima : undefined;
+  };
+  return Promise.race([buscar().catch(() => undefined), new Promise(ok => setTimeout(() => ok(undefined), 20000))]);
 }
 function sucessoComum(pago, imprime) {
   // Reimprimir não fica com o cliente: o atendente usa "Reimprimir última venda" no Diagnóstico.
@@ -1037,18 +1813,41 @@ const dataHora = q => `${doisDigitos(q.getDate())}/${doisDigitos(q.getMonth() + 
 /** Linhas em branco depois do logo até ele passar da serrilha. Se sobrar papel demais
     (ou de menos) na sua impressora, ajuste aqui: cada linha é uns 4 mm. */
 const FOLGA_CORTE = 3;
-/** Marca Zilado Pay pequena no fim do papel e sobe o papel até a serrilha.
+/** Com guilhotina: linhas em branco até a última linha impressa passar da lâmina (fica uns
+    15 mm acima da cabeça de impressão). Se a guilhotina cortar o fim do texto, aumente. */
+const FOLGA_GUILHOTINA = 4;
+
+/* ---------- Papel (largura e corte), guardado no aparelho junto da impressora ---------- */
+let papel = {largura: 58, corte: 'serrilha'};
+function aplicarPapel() {
+  try { papel = Object.assign({largura: 58, corte: 'serrilha'}, JSON.parse(PonteImpressora.papel())); } catch (_) { /* fica o padrão */ }
+  Escpos.COLUNAS = papel.largura === 80 ? 48 : 32;
+}
+aplicarPapel(); // já na abertura do app: o primeiro comprovante sai na largura certa
+const temGuilhotina = () => papel.corte === 'parcial' || papel.corte === 'total';
+/** Termina um pedaço de papel: com guilhotina sobe até a lâmina e corta; sem, sobe até a serrilha. */
+function cortarPapel(d) {
+  return temGuilhotina() ? d.avancar(FOLGA_GUILHOTINA).cortar(papel.corte === 'parcial') : d.avancar(FOLGA_CORTE);
+}
+/** Marca Zilado Pay (ou a do cliente, na marca branca) pequena no fim do papel e sobe o papel até a serrilha.
     O topo fica com o nome do estabelecimento. */
 function fimDoPapel(d) {
-  if (window.LOGO_TERMICA) d.avancar(1).alinhar(1).raster(window.LOGO_TERMICA).alinhar(0);
-  return d.avancar(FOLGA_CORTE);
+  // Marca branca: logo do cliente convertido pelo servidor (ou nenhum, se não tiver logo).
+  // O ponto de venda pode desligar o logo no painel para imprimir mais rápido (store.print_logo).
+  const semLogo = loja && loja.store.print_logo === false;
+  const logo = semLogo ? null : marca.whitelabel ? (loja && loja.tenant.logo_print) : window.LOGO_TERMICA;
+  if (logo) d.avancar(1).alinhar(1).raster(logo).alinhar(0);
+  return cortarPapel(d);
 }
-/** Escreve o comprovante em `d`, sem avançar o papel no fim. */
+/** Escreve o comprovante em `d`, sem avançar o papel no fim. Com NFC-e autorizada, sai o DANFE. */
 function escreverComprovante(d, pago, rodape) {
+  if (pago.nota && pago.nota.status === 'authorized') return escreverDanfe(d, pago, rodape);
   const p = pago.pedido, q = pago.quando;
   d.alinhar(1).negrito(true).texto(loja.tenant.name).negrito(false).texto(loja.store.name).regua();
   if (pago.segundaVia) d.negrito(true).linha('*** 2a VIA ***').negrito(false);
   d.linha('PEDIDO').dobrado(true).negrito(true).linha(p.code).negrito(false).dobrado(false);
+  // "PARA LEVAR" em destaque: é o que a cozinha/balcão precisa ver primeiro.
+  if (p.fulfillment_label) d.dobrado(true).negrito(true).texto(p.fulfillment_label.toUpperCase(), Escpos.COLUNAS / 2).negrito(false).dobrado(false);
   d.alinhar(0).regua();
   for (const i of p.items) {
     d.colunas(`${i.quantity}x ${i.name}`, dinheiro(i.total_cents));
@@ -1057,7 +1856,47 @@ function escreverComprovante(d, pago, rodape) {
   d.regua().negrito(true).colunas('TOTAL', 'R$ ' + dinheiro(p.total_cents)).negrito(false);
   d.linha('Pagamento: ' + pago.forma);
   d.linha(dataHora(q));
+  // Venda com nota que não saiu a tempo: o estabelecimento emite pelo painel.
+  if (pago.notaPendente) d.regua().alinhar(1).texto('NFC-e em processamento. Solicite a nota fiscal ao atendente.').alinhar(0);
   return d.regua().alinhar(1).texto(rodape || 'Retire seu pedido no balcao.').alinhar(0);
+}
+const formatarCnpj = c => soDigitos(c).replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5');
+const formatarChave = c => soDigitos(c).replace(/(\d{4})(?=\d)/g, '$1 ');
+const comZeros = (n, t) => String(n == null ? '' : n).padStart(t, '0');
+const quandoIso = (t, padrao) => { const q = t ? new Date(t) : null; return q && !isNaN(q) ? q : padrao; };
+/** DANFE NFC-e (Documento Auxiliar da NFC-e), no layout resumido da bobina:
+    emitente, itens, total, pagamento, consulta pela chave, consumidor, número/série/protocolo
+    e QR Code. O código do pedido continua em destaque para a retirada. */
+function escreverDanfe(d, pago, rodape) {
+  const p = pago.pedido, n = pago.nota, e = n.emitter || {};
+  d.alinhar(1).negrito(true).texto(e.name || loja.tenant.name).negrito(false);
+  if (e.cnpj) d.texto('CNPJ ' + formatarCnpj(e.cnpj) + (e.ie ? '  IE ' + e.ie : ''));
+  const endereco = [[e.street, e.number].filter(Boolean).join(', '), e.district, [e.city, e.state].filter(Boolean).join('-')].filter(Boolean).join(' - ');
+  if (endereco) d.texto(endereco);
+  d.texto('Documento Auxiliar da Nota Fiscal de Consumidor Eletronica').regua();
+  if (pago.segundaVia) d.negrito(true).linha('*** 2a VIA ***').negrito(false);
+  d.linha('PEDIDO').dobrado(true).negrito(true).linha(p.code).negrito(false).dobrado(false);
+  if (p.fulfillment_label) d.dobrado(true).negrito(true).texto(p.fulfillment_label.toUpperCase(), Escpos.COLUNAS / 2).negrito(false).dobrado(false);
+  d.alinhar(0).regua();
+  for (const i of p.items) {
+    d.colunas(`${i.quantity}x ${i.name}`, dinheiro(i.total_cents));
+    if (i.quantity > 1) d.linha(`   ${i.quantity} UN x ${dinheiro(i.unit_price_cents)}`);
+  }
+  d.regua().colunas('Qtd. total de itens', String(p.items.reduce((t, i) => t + i.quantity, 0)));
+  d.negrito(true).colunas('Valor a pagar R$', dinheiro(p.total_cents)).negrito(false);
+  d.colunas('FORMA DE PAGAMENTO', 'VALOR PAGO R$').colunas(pago.forma, dinheiro(p.total_cents)).regua();
+  d.alinhar(1);
+  if (n.environment === 'homologation') d.negrito(true).texto('EMITIDA EM AMBIENTE DE HOMOLOGACAO - SEM VALOR FISCAL').negrito(false);
+  if (n.consult_url) d.texto('Consulte pela Chave de Acesso em').texto(n.consult_url);
+  if (n.access_key) d.texto(formatarChave(n.access_key));
+  d.regua().texto(n.customer_document ? 'CONSUMIDOR - CPF ' + mascaraCpf(n.customer_document) : 'CONSUMIDOR NAO IDENTIFICADO').regua();
+  d.negrito(true).texto(`NFC-e n ${comZeros(n.number, 9)} Serie ${comZeros(n.series, 3)} ${dataHora(quandoIso(n.issued_at, pago.quando))}`).negrito(false);
+  if (n.protocol) d.texto('Protocolo de autorizacao: ' + n.protocol);
+  if (n.authorized_at) d.texto('Data de autorizacao: ' + dataHora(quandoIso(n.authorized_at, pago.quando)));
+  // O QR Code da SEFAZ é uma URL comprida: pontos menores para caber na bobina.
+  if (n.qrcode) d.qr(n.qrcode, Escpos.COLUNAS === 48 ? 6 : 4);
+  if (n.total_taxes_cents != null) d.texto('Tributos totais incidentes (Lei Federal 12.741/2012): R$ ' + dinheiro(n.total_taxes_cents));
+  return d.regua().texto(rodape || 'Retire seu pedido no balcao.').alinhar(0);
 }
 function montarComprovante(pago) {
   return fimDoPapel(escreverComprovante(Escpos.novo(), pago));
@@ -1083,7 +1922,7 @@ async function imprimirComprovante(pago) {
 const codigoFicha = c => c.slice(0, 5) + '-' + c.slice(5);
 function listarFichas(p) {
   const total = (p.tickets || []).length;
-  return (p.tickets || []).map(t => ({nome: t.name, obs: t.notes || '', n: t.number, total, codigo: t.code, impressa: false}));
+  return (p.tickets || []).map(t => ({nome: t.name, obs: t.notes || '', n: t.number, total, codigo: t.code, entrega: p.fulfillment_label || '', impressa: false}));
 }
 /** O pedido pago, como o servidor vê: com as fichas. null = sem resposta do servidor a tempo.
     No PIX as fichas já vieram junto com a confirmação. No cartão o servidor só as cria quando
@@ -1111,7 +1950,7 @@ async function emitirFichas(pago, imprime) {
     // O atendente acha o pedido pelo código em /balcao e dá baixa por lá.
     log('fichas', {pedido: pago.pedido.code, erro: 'servidor não respondeu'});
     aviso('Não foi possível gerar suas fichas agora. Chame um atendente e mostre o código do pedido:');
-    if (imprime) imprimir(escreverComprovante(Escpos.novo(), pago, 'FICHAS NAO EMITIDAS. Mostre este comprovante ao atendente.').avancar(4));
+    if (imprime) imprimir(fimDoPapel(escreverComprovante(Escpos.novo(), pago, 'FICHAS NAO EMITIDAS. Mostre este comprovante ao atendente.')));
     return;
   }
   // Pedido pago e sem fichas: o modo evento foi desligado no painel depois que este totem leu a loja.
@@ -1124,12 +1963,15 @@ async function emitirFichas(pago, imprime) {
 }
 function escreverFicha(d, f, codigo, quando, semValor) {
   const tracejado = '- '.repeat(Escpos.COLUNAS / 2).trim();
-  d.alinhar(1).linha(tracejado).linha(Escpos.quebrar(loja.tenant.name, Escpos.COLUNAS)[0]);
+  d.alinhar(1);
+  if (!temGuilhotina()) d.linha(tracejado); // sem guilhotina, o tracejado marca onde rasgar
+  d.linha(Escpos.quebrar(loja.tenant.name, Escpos.COLUNAS)[0]);
   // Letra dobrada ocupa duas colunas: cabe metade por linha. Nome comprido demais para
   // duas linhas assim sai só com a altura em dobro, para não gastar papel.
   if (Escpos.quebrar(f.nome, Escpos.COLUNAS / 2).length <= 2) d.dobrado(true).negrito(true).texto(f.nome, Escpos.COLUNAS / 2).negrito(false).dobrado(false);
   else d.alto(true).negrito(true).texto(f.nome).negrito(false).alto(false);
   if (f.obs) d.texto('obs: ' + f.obs);
+  if (f.entrega) d.negrito(true).texto(f.entrega.toUpperCase()).negrito(false);
   // O QR Code é o que vale no balcão; o código embaixo é para digitar se a câmera não ler.
   if (f.codigo) d.qr(f.codigo).linha(codigoFicha(f.codigo));
   d.negrito(true).linha(semValor ? 'TESTE - SEM VALOR' : 'VALE 1 UNIDADE').negrito(false);
@@ -1142,10 +1984,16 @@ function montarFichas(pago, fichas, comComprovante) {
   if (comComprovante) {
     escreverComprovante(d, pago, 'Retire com as fichas abaixo.');
     d.alinhar(1).negrito(true).linha('NAO VALE COMO FICHA').negrito(false).alinhar(0);
-    fimComprovante = d.tamanho(); d.avancar(1);
+    fimComprovante = d.tamanho();
+    if (temGuilhotina()) cortarPapel(d); else d.avancar(1);
   }
-  for (const f of fichas) { escreverFicha(d, f, pago.pedido.code, pago.quando); fins.push(d.tamanho()); d.avancar(1); }
-  d.alinhar(1).linha('- '.repeat(Escpos.COLUNAS / 2).trim()).alinhar(0); // fecha a última
+  // Com guilhotina, cada ficha sai cortada; a última corta em fimDoPapel, depois do logo.
+  fichas.forEach((f, k) => {
+    escreverFicha(d, f, pago.pedido.code, pago.quando); fins.push(d.tamanho());
+    if (!temGuilhotina()) d.avancar(1);
+    else if (k < fichas.length - 1) cortarPapel(d);
+  });
+  if (!temGuilhotina()) d.alinhar(1).linha('- '.repeat(Escpos.COLUNAS / 2).trim()).alinhar(0); // fecha a última
   fimDoPapel(d);
   return {doc: d, fins, fimComprovante};
 }
@@ -1276,7 +2124,7 @@ async function entrarPin() {
     r.status === 422 ? 'PIN incorreto.'
     : r.status === 409 ? 'Este ponto de venda ainda não tem PIN. Defina no painel, em Estrutura › Pontos de venda › Acesso ao totem.'
     : r.status === 429 ? 'Muitas tentativas. Aguarde um minuto e tente de novo.'
-    : r.status === 0 ? 'Sem conexão com o servidor, e este aparelho ainda não tem o PIN guardado. Confira a internet.'
+    : r.status === 0 ? 'Sem conexão com o servidor, e este aparelho ainda não tem o PIN da loja guardado. Confira a internet ou use o PIN de suporte.'
     : (r.mensagem || 'O servidor respondeu com erro ' + r.status + '.'));
 }
 
@@ -1288,13 +2136,16 @@ function abrirAdmin() {
     : (loja ? `${loja.totem.name} · ${loja.store.name} · ${loja.tenant.name}` : 'Pareado, sem contato com o servidor')
       + `\nServidor: ${estado.servidor} · App ${estado.versao}`
       + (loja ? `\nModo evento: ${modoEvento() ? 'ligado (uma ficha por item)' : 'desligado (comprovante único)'}` : '')
+      + (loja ? `\nLogo no papel: ${loja.store.print_logo === false ? 'desligado' : 'ligado'}` : '')
+      + `\nPapel: ${papel.largura} mm · ${{serrilha: 'sem guilhotina', parcial: 'guilhotina (corte parcial)', total: 'guilhotina (corte total)'}[papel.corte]}`
       + `\nPagamentos aguardando envio: ${lerFila().length}`;
   $('statusTotem').style.whiteSpace = 'pre-line';
   $('btnDesparear').textContent = 'Desparear'; confirmandoDesparear = false;
   mostrarQuiosque();
   $('statusImpressora').hidden = true;
+  mostrarPapel();
   mostrarUltimaVenda();
-  ir('admin'); mostrarInfo(); listarImpressoras(); listarLeitores();
+  ir('admin'); mostrarInfo(); listarImpressoras(); listarLeitores(); listarTemas();
 }
 function fecharAdmin() {
   if (telaAtual() !== 'admin') return;
@@ -1302,6 +2153,8 @@ function fecharAdmin() {
 }
 function voltarDoAdmin() {
   if (['pix', 'pagando'].includes(telaAntes)) return ir(telaAntes);
+  // Servidor ainda fora: volta para "Sem conexão" (a nova tentativa já está marcada).
+  if (telaAntes === 'indisponivel') return ir('indisponivel');
   if (bloqueio && loja) return avisarBloqueio();
   if (faltaImpressora()) return avisarFaltaImpressora();
   ir(loja ? 'inicio' : telaAntes);
@@ -1363,14 +2216,29 @@ function listarImpressoras() {
   if (impressoraAtual())
     caixa.append(el('button', {class: 'leitor', onclick: () => escolher('', '')}, el('span', {}, 'Não imprimir', el('small', {}, modoEvento() ? 'No modo evento o totem para de vender sem impressora' : 'O totem só mostra o código do pedido na tela'))));
 }
+/* Largura e corte: botões no Diagnóstico. Valem para a próxima impressão. */
+function mostrarPapel() {
+  aplicarPapel();
+  const caixa = $('papelImpressora'); caixa.textContent = '';
+  const opcao = (sel, titulo, detalhe, acao) => el('button', {class: 'leitor' + (sel ? ' sel' : ''), onclick: acao},
+    el('span', {}, titulo, el('small', {}, detalhe)), sel ? el('span', {class: 'tag'}, 'EM USO') : null);
+  const definir = (largura, corte) => { PonteImpressora.definirPapel(largura, corte); log('papel', {largura, corte}); mostrarPapel(); };
+  caixa.append(
+    opcao(papel.largura === 58, 'Bobina de 58 mm', '32 caracteres por linha', () => definir(58, papel.corte)),
+    opcao(papel.largura === 80, 'Bobina de 80 mm', '48 caracteres por linha', () => definir(80, papel.corte)),
+    opcao(papel.corte === 'serrilha', 'Sem guilhotina', 'O cliente rasga o papel na serrilha', () => definir(papel.largura, 'serrilha')),
+    opcao(papel.corte === 'parcial', 'Guilhotina: corte parcial', 'Deixa uma pontinha presa; o cliente destaca sem esforço', () => definir(papel.largura, 'parcial')),
+    opcao(papel.corte === 'total', 'Guilhotina: corte total', 'O papel sai solto; no modo evento cada ficha sai separada', () => definir(papel.largura, 'total')));
+}
 /* ---------- Última venda ----------
    Guardada no aparelho para o atendente reimprimir pelo Diagnóstico quando o papel acaba
    ou a impressora descarrega no meio. Reimprimir não cria fichas: são as mesmas, com os
    mesmos códigos, e o balcão só aceita cada uma uma vez (ficha já entregue é recusada). */
 const CHAVE_ULTIMA_VENDA = 'totem.ultimaVenda';
 function guardarUltimaVenda(pago) {
-  const {pedido: p, forma, quando} = pago;
-  try { localStorage.setItem(CHAVE_ULTIMA_VENDA, JSON.stringify({pedido: p, forma, quando: quando.toISOString()})); }
+  const {pedido: p, forma, quando, nota, notaPendente} = pago;
+  // A NFC-e vai junto: a 2a via sai com o DANFE.
+  try { localStorage.setItem(CHAVE_ULTIMA_VENDA, JSON.stringify({pedido: p, forma, quando: quando.toISOString(), nota: nota || null, notaPendente: !!notaPendente})); }
   catch (_) { /* sem espaço: só perde a reimpressão */ }
 }
 function lerUltimaVenda() {
@@ -1396,6 +2264,12 @@ async function reimprimirUltimaVenda() {
   if (!loja) { e.className = 'aviso erro'; e.textContent = 'Sem os dados da loja (servidor fora do ar). Tente de novo quando ele voltar.'; return; }
   reimprimindo = true; $('btnReimprimir').disabled = true;
   e.className = 'aviso'; e.textContent = `Reimprimindo o pedido ${v.pedido.code}...`;
+  // A nota não tinha saído a tempo na venda: busca de novo, para a 2a via já sair com o DANFE.
+  if (v.notaPendente) {
+    const r = await api('GET', `/orders/${v.pedido.uuid}`).catch(() => null);
+    const n = r && r.ok ? r.dados.data.invoice : null;
+    if (n && n.status === 'authorized') { v.nota = n; v.notaPendente = false; guardarUltimaVenda(v); }
+  }
   const pago = Object.assign(v, {segundaVia: true});
   const fichas = listarFichas(pago.pedido);
   const doc = fichas.length ? montarFichas(pago, fichas, true).doc : montarComprovante(pago);
@@ -1410,9 +2284,9 @@ async function imprimirTeste() {
   statusImpressora('Imprimindo... (pode levar alguns segundos para conectar)');
   const d = Escpos.novo();
   d.alinhar(1).negrito(true).linha('TESTE DE IMPRESSAO').negrito(false);
-  d.dobrado(true).linha('ZILADO PAY').dobrado(false).alinhar(0).regua();
-  d.linha('12345678901234567890123456789012');
-  d.texto('A linha de numeros acima deve caber inteira em uma linha so. Se quebrou, o papel tem menos de 32 colunas.');
+  d.dobrado(true).linha(marca.whitelabel ? (marca.nome || 'AUTOATENDIMENTO') : 'ZILADO PAY').dobrado(false).alinhar(0).regua();
+  d.linha('1234567890'.repeat(5).slice(0, Escpos.COLUNAS));
+  d.texto(`Papel de ${papel.largura} mm. A linha de numeros acima deve caber inteira em uma linha so. Se quebrou, o papel tem menos de ${Escpos.COLUNAS} colunas; se sobrou muito espaco, escolha a bobina maior.`);
   d.colunas('2x Produto de exemplo', '24,00').colunas('TOTAL', 'R$ 24,00');
   d.texto('Acentos saem sem acento: ação, pão, você.').regua();
   // No modo evento sai também uma ficha de exemplo, para conferir o tamanho da letra.
@@ -1458,8 +2332,49 @@ function listarLeitores() {
 let toques = 0, timerToques;
 $('cantoAdmin').addEventListener('click', () => {
   toques++; clearTimeout(timerToques); timerToques = setTimeout(() => toques = 0, 1500);
-  if (toques >= 5 && !['pin', 'admin'].includes(telaAtual())) { toques = 0; pedirPin(); }
+  if (toques >= 5 && !operadorNaTela()) { toques = 0; pedirPin(); }
 });
+
+/* =====================================================================
+   TEMAS (aparência das telas do cliente)
+   Cada tema se registra em window.TEMAS (ver temas/mrcold.js). Quem escolhe, nesta ordem:
+   ?tema= na URL (testes no navegador), a escolha feita no Diagnóstico deste aparelho e,
+   quando o painel mandar, loja.store.home.theme. Sem nada disso: o visual padrão da Zilado Pay.
+   ===================================================================== */
+const TEMAS = window.TEMAS || {};
+let tema = null, nomeTema = 'padrao';
+const CHAVE_TEMA = 'totem.tema';
+function temaLocal() { try { return localStorage.getItem(CHAVE_TEMA) || ''; } catch (_) { return ''; } }
+function escolherTema() {
+  const valido = n => n && (n === 'padrao' || TEMAS[n]);
+  const painel = loja && loja.store.home && loja.store.home.theme;
+  const nome = [new URLSearchParams(location.search).get('tema'), temaLocal(), painel].find(valido) || 'padrao';
+  if (nome === nomeTema) return;
+  document.body.classList.remove('tema-' + nomeTema);
+  nomeTema = nome; tema = TEMAS[nome] || null;
+  document.body.classList.add('tema-' + nome);
+  if (tema && tema.aplicar) tema.aplicar();
+  if (tema && tema.logoEmpresa) tema.logoEmpresa(marca.logo_url);
+  assinaturaBotoes = null; // redesenha os botões da tela inicial com o desenho do tema
+  if (loja) { aplicarInicio(loja.store.home); desenharBotoesInicio(); }
+  desenharCardapio();
+}
+function listarTemas() {
+  const caixa = $('temas'); caixa.textContent = '';
+  const atual = temaLocal();
+  const opcoes = [['', 'Automático', 'o que o painel definir para o ponto de venda'], ['padrao', 'Zilado Pay', 'visual padrão']]
+    .concat(Object.entries(TEMAS).map(([n, t]) => [n, t.nome || n, t.descricao || '']));
+  for (const [valor, nome, sub] of opcoes) {
+    const sel = valor === atual;
+    caixa.append(el('button', {class: 'leitor' + (sel ? ' sel' : ''), onclick: () => {
+      try { if (valor) localStorage.setItem(CHAVE_TEMA, valor); else localStorage.removeItem(CHAVE_TEMA); } catch (_) { /* sem armazenamento */ }
+      escolherTema(); listarTemas(); log('tema', valor || 'automático');
+    }}, el('span', {}, nome, el('small', {}, sub)), sel ? el('span', {class: 'tag'}, 'EM USO') : null));
+  }
+}
+document.body.classList.add('tema-padrao');
+escolherTema();
+aplicarMarca(marcaGuardada());
 
 iniciar();
 </script>

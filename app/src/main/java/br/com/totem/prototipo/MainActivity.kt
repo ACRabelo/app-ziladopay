@@ -5,7 +5,10 @@ import android.annotation.SuppressLint
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
+import android.view.KeyEvent
 import android.view.WindowManager
+import android.webkit.RenderProcessGoneDetail
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -22,6 +25,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var bridge: TotemBridge
     private lateinit var api: ApiBridge
     private lateinit var impressora: ImpressoraBridge
+    private val emergencia = Emergencia(this)
 
     private val pedirPermissoes =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { /* a página consulta via info() */ }
@@ -40,7 +44,8 @@ class MainActivity : AppCompatActivity() {
             settings.mediaPlaybackRequiresUserGesture = false
             settings.setSupportZoom(false)
             settings.builtInZoomControls = false
-            webViewClient = ClienteRestrito(BuildConfig.TOTEM_URL)
+            // Se o processo do WebView cair, recria a tela em vez de o app fechar.
+            webViewClient = ClienteRestrito(BuildConfig.TOTEM_URL) { recreate() }
         }
         setContentView(webView)
 
@@ -75,7 +80,14 @@ class MainActivity : AppCompatActivity() {
         Quiosque.entrar(this)
     }
 
+    // Saída de emergência nativa (sequência nos botões de volume). Veja Emergencia.kt.
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        emergencia.observar(event)
+        return super.dispatchKeyEvent(event)
+    }
+
     override fun onDestroy() {
+        emergencia.encerrar()
         bridge.encerrar()
         api.encerrar()
         impressora.encerrar()
@@ -111,12 +123,19 @@ class MainActivity : AppCompatActivity() {
      * A ponte JS dá acesso ao pagamento, então o WebView só navega dentro da origem configurada.
      * Qualquer link externo é bloqueado.
      */
-    private class ClienteRestrito(urlInicial: String) : WebViewClient() {
+    private class ClienteRestrito(urlInicial: String, private val aoCair: () -> Unit) : WebViewClient() {
         private val origem = Uri.parse(urlInicial).let { "${it.scheme}://${it.authority ?: ""}" }
 
         override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
             val alvo = request.url.let { "${it.scheme}://${it.authority ?: ""}" }
             return alvo != origem // true = bloqueia
+        }
+
+        @androidx.annotation.RequiresApi(26) // antes do Android 8 o WebView não avisa
+        override fun onRenderProcessGone(view: WebView, detail: RenderProcessGoneDetail): Boolean {
+            Log.e("MainActivity", "Processo do WebView caiu (crash=${detail.didCrash()}); recriando a tela")
+            view.post(aoCair)
+            return true // o app trata; sem isso o Android fecha o app
         }
     }
 }
