@@ -141,6 +141,42 @@
   .qtd button{width:42px;height:42px;border-radius:50%;background:var(--linha);font-size:1.4rem;font-weight:700}
   .qtd span{min-width:22px;text-align:center;font-weight:700;font-size:1.2rem}
   .rodape{display:flex;flex-direction:column;gap:12px}
+  /* Produto composto: o que já foi escolhido, uma linha por combinação, dentro do cartão */
+  .item .escolhidas{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+  .item .escolhida{display:flex;align-items:center;gap:8px;font-size:.85rem;color:var(--txt);background:var(--bg);
+    border-radius:12px;padding:6px 6px 6px 10px}
+  .item .escolhida .t{flex:1;min-width:0;line-height:1.2}
+  .item .escolhida .qtd button{width:34px;height:34px;font-size:1.1rem}
+  .item .escolhida .qtd span{font-size:1rem}
+
+  /* Produto composto: tela de escolha por cima do cardápio (também nos temas) */
+  .escolha{position:fixed;inset:0;z-index:50;background:var(--bg);color:var(--txt);display:flex;flex-direction:column;padding:22px 22px 18px}
+  .escolha[hidden]{display:none}
+  .escolha .topo{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .escolha .topo .fechar{width:52px;height:52px;border-radius:50%;background:var(--linha);font-size:1.4rem;font-weight:700;flex:none}
+  .escolha .topo h2{margin:0;flex:1;font-size:1.5rem;line-height:1.1}
+  .escolha .topo .preco{color:var(--acento);font-weight:800;font-size:1.3rem;white-space:nowrap}
+  .escolha .grupos{flex:1;overflow:auto;display:flex;flex-direction:column;gap:22px;padding:4px 2px 14px;-webkit-overflow-scrolling:touch}
+  .escolha .grupo{border-radius:16px;padding:6px}
+  .escolha .grupo.pisca{animation:pisca .8s 2}
+  @keyframes pisca{50%{background:rgba(255,176,0,.16)}}
+  .escolha .grupo-cab{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin:0 2px 10px}
+  .escolha .grupo-cab b{font-size:1.2rem}
+  .escolha .regra{color:var(--suave);font-size:.95rem;text-align:right}
+  .escolha .grupo.completo .regra{color:var(--ok)}
+  .escolha .opcoes{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  @media (min-width:600px){ .escolha .opcoes{grid-template-columns:repeat(3,1fr)} }
+  .escolha .opcao{min-height:4.4rem;padding:12px 10px;border-radius:16px;border:2px solid var(--linha);background:var(--painel);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-align:center;
+    font-weight:600;font-size:1.05rem;line-height:1.15;cursor:pointer}
+  .escolha .opcao small{font-size:.85rem;color:var(--suave);font-weight:600}
+  .escolha .opcao.sel{border-color:var(--acento);background:rgba(255,176,0,.14);font-weight:800}
+  .escolha .opcao.apagada,.escolha .opcao.esgotada{opacity:.35}
+  .escolha .opcao .rep{display:flex;align-items:center;gap:12px;margin-top:4px}
+  .escolha .opcao .rep button{width:36px;height:36px;border-radius:50%;background:var(--linha);font-size:1.2rem;font-weight:700}
+  .escolha .pe{display:flex;flex-direction:column;gap:12px;padding-top:12px;border-top:2px solid var(--linha)}
+  .escolha .pe .linha-qtd{display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:1.15rem}
+  .escolha .pe .btn.incompleto{background:var(--linha);color:var(--suave)}
   .total{display:flex;justify-content:space-between;font-size:1.4rem;font-weight:700}
 
   /* Formas */
@@ -167,6 +203,10 @@
   #maquininha .valor{font-size:2.2rem;font-weight:800}
   #maquininha .maq-passo{font-size:1.35rem;font-weight:700;max-width:28ch;line-height:1.35}
   #maquininha .maq-passo.alerta{color:var(--acento)}
+  #maquininha .maq-verde{display:flex;align-items:center;gap:1rem;padding:1rem 1.4rem;border-radius:1.2rem;background:rgba(22,163,74,.12);border:3px solid #16a34a;font-size:1.45rem;font-weight:800;max-width:30ch;text-align:left;line-height:1.3}
+  #maquininha .maq-verde[hidden]{display:none}
+  #maquininha .maq-bolinha{flex:none;width:3.2rem;height:3.2rem;border-radius:50%;background:#16a34a;animation:aperte 1.4s ease-out infinite}
+  @keyframes aperte{0%{box-shadow:0 0 0 0 rgba(22,163,74,.6)}70%{box-shadow:0 0 0 18px rgba(22,163,74,0)}100%{box-shadow:0 0 0 0 rgba(22,163,74,0)}}
   #maquininha .relogio{font-variant-numeric:tabular-nums;font-weight:700;color:var(--acento)}
   #pix .btn{margin-top:auto}
 
@@ -205,7 +245,6 @@
      Os elementos próprios de um tema (classe .so-tema) ficam escondidos fora dele. */
   .so-tema{display:none !important}
 </style>
-<link rel="stylesheet" href="temas/mrcold.css">
 </head>
 <body>
 
@@ -277,6 +316,9 @@ zilou.</h1>
   </div>
 </section>
 
+<!-- 2a. Produto composto: escolhas antes do carrinho (preenchida por desenharEscolha) -->
+<div class="escolha" id="escolha" hidden></div>
+
 <!-- 2b. Nota fiscal (NFC-e no modo "sob solicitação"): o consumidor quer nota? CPF opcional. -->
 <section class="tela" id="nota">
   <h2>Deseja nota fiscal?</h2>
@@ -324,6 +366,7 @@ zilou.</h1>
   <h2 id="maqTitulo">Pague na maquininha</h2>
   <div class="valor" id="maqValor"></div>
   <p class="suave" id="maqForma"></p>
+  <div class="maq-verde" id="maqVerde" hidden><span class="maq-bolinha" aria-hidden="true"></span><span>Aperte o <b>botão verde</b> da maquininha</span></div>
   <p class="maq-passo" id="maqPasso">Enviando para a maquininha...</p>
   <p class="suave">Tempo para pagar: <span class="relogio" id="maqRelogio">--:--</span></p>
   <button class="btn sec" id="btnCancelarMaq" onclick="cancelarMaquininha()">Cancelar</button>
@@ -414,7 +457,6 @@ zilou.</h1>
 
 <script src="marca.js"></script>
 <script src="qrcode.js"></script>
-<script src="temas/mrcold.js"></script>
 <script>
 'use strict';
 
@@ -661,7 +703,7 @@ async function api(metodo, caminho, corpo) {
 let loja = null;                 // resposta de /me
 let categorias = [];             // resposta de /catalog
 let cardapioEm = 0;              // quando o cardápio foi carregado
-const carrinho = new Map();      // id do produto -> quantidade
+const carrinho = new Map();      // linha -> quantidade. Linha = id do produto; produto composto: "id:opção*qtd,..." (ver chaveDaLinha)
 let pedido = null;               // pedido criado no servidor para o carrinho atual
 let entrega = null;              // "dine_in" | "takeaway", escolhido na tela inicial; null = a loja não pergunta
 let leadUuid = null;             // formulário respondido por este cliente (vai no pedido)
@@ -675,15 +717,56 @@ let bloqueio = null;             // vendas bloqueadas no painel: {message} vindo
 const brl = c => (c / 100).toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
 const $ = id => document.getElementById(id);
 const produtos = () => categorias.flatMap(c => c.products);
-const total = () => produtos().reduce((s, p) => s + (carrinho.get(p.id) || 0) * p.price_cents, 0);
-const assinatura = () => JSON.stringify([...carrinho].filter(([, q]) => q > 0).sort((a, b) => a[0] - b[0]));
+
+/* Produto composto (módulo no painel): o produto traz option_groups e o cliente escolhe antes
+   de pôr no carrinho. Cada combinação de escolhas é uma linha do carrinho, com chave
+   "id:opção*qtd,opção*qtd" (opções em ordem de id); produto comum continua com o id (número),
+   como sempre, para os temas que leem carrinho.get(p.id). */
+const composto = p => !!(p && p.option_groups && p.option_groups.length);
+const idDaLinha = k => typeof k === 'number' ? k : Number(String(k).split(':')[0]);
+const escolhasDaLinha = k => typeof k === 'number' || !String(k).includes(':') ? []
+  : String(k).split(':')[1].split(',').filter(Boolean).map(t => { const [id, q] = t.split('*').map(Number); return {id, quantity: q || 1}; });
+const chaveDaLinha = (id, escolhas) => escolhas.length
+  ? id + ':' + escolhas.slice().sort((a, b) => a.id - b.id).map(e => e.id + '*' + e.quantity).join(',') : id;
+const linhasDoCarrinho = () => [...carrinho].filter(([, q]) => q > 0)
+  .map(([chave, q]) => ({chave, q, p: produtos().find(x => x.id === idDaLinha(chave))})).filter(l => l.p);
+const linhasDoProduto = id => linhasDoCarrinho().filter(l => l.p.id === id);
+const qtdDoProduto = id => linhasDoProduto(id).reduce((s, l) => s + l.q, 0);
+const opcoesDoProduto = p => (p.option_groups || []).flatMap(g => g.options.map(o => ({g, o})));
+const precoDaLinha = (p, k) => p.price_cents + escolhasDaLinha(k).reduce((s, e) => {
+  const x = opcoesDoProduto(p).find(y => y.o.id === e.id); return s + (x ? x.o.price_cents * e.quantity : 0); }, 0);
+/** "Boi, Arroz branco, 2x Feijão", na ordem do cadastro. */
+function textoEscolhas(p, k) {
+  const q = new Map(escolhasDaLinha(k).map(e => [e.id, e.quantity]));
+  return opcoesDoProduto(p).filter(x => q.has(x.o.id)).map(x => (q.get(x.o.id) > 1 ? q.get(x.o.id) + 'x ' : '') + x.o.name).join(', ');
+}
+/** A linha ainda vale com o cardápio atual? (opção apagada, esgotada ou regra que mudou: não) */
+function linhaValida(p, k) {
+  if (!composto(p)) return typeof k === 'number' || !String(k).includes(':');
+  const sel = new Map(escolhasDaLinha(k).map(e => [e.id, e.quantity]));
+  const conhecidas = new Map(opcoesDoProduto(p).map(x => [x.o.id, x]));
+  for (const [id, q] of sel) { const x = conhecidas.get(id); if (!x || !x.o.available || (q > 1 && !x.g.allow_repeat)) return false; }
+  return p.option_groups.every(g => grupoCompleto(g, sel));
+}
+const contaGrupo = (g, sel) => g.options.reduce((s, o) => s + (sel.get(o.id) || 0), 0);
+const grupoCompleto = (g, sel) => { const n = contaGrupo(g, sel); return n >= g.min && (g.max == null || n <= g.max); };
+/** Preço no cartão: "a partir de" quando alguma escolha soma preço. */
+function textoPreco(p) {
+  if (!opcoesDoProduto(p).some(x => x.o.price_cents > 0)) return brl(p.price_cents);
+  const minimo = (p.option_groups || []).reduce((s, g) => {
+    const precos = g.options.filter(o => o.available).map(o => o.price_cents).sort((a, b) => a - b);
+    return s + precos.slice(0, g.min).reduce((t, v) => t + v, 0); }, p.price_cents);
+  return 'a partir de ' + brl(minimo);
+}
+const total = () => linhasDoCarrinho().reduce((s, l) => s + l.q * precoDaLinha(l.p, l.chave), 0);
+const assinatura = () => JSON.stringify([...carrinho].filter(([, q]) => q > 0).map(([k, q]) => [String(k), q]).sort((a, b) => a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0));
 
 /* Estoque. O servidor manda stock_available (quanto ainda dá para vender; null = sem limite)
    e stock_low (está acabando). O número só serve para travar o "+": o cliente nunca vê
    quanto há em estoque, só o aviso "Últimas N unidades" quando stock_low vem true. */
 const MAX_POR_ITEM = 99;
 const limiteDe = p => p.stock_available == null ? MAX_POR_ITEM : Math.min(MAX_POR_ITEM, p.stock_available);
-const podeMais = p => (carrinho.get(p.id) || 0) < limiteDe(p);
+const podeMais = p => qtdDoProduto(p.id) < limiteDe(p);
 function textoRestam(p) {
   if (p.stock_available == null) return null;
   if (p.stock_low) return p.stock_available === 1 ? 'Última unidade' : `Últimas ${p.stock_available} unidades`;
@@ -697,8 +780,15 @@ function seloRestam(p, classe) { const t = textoRestam(p); return t ? el('span',
 function ajustarCarrinhoAoEstoque() {
   let mudou = false;
   for (const p of produtos()) {
-    const q = carrinho.get(p.id) || 0, lim = limiteDe(p);
-    if (q > lim) { mudou = true; if (lim > 0) carrinho.set(p.id, lim); else carrinho.delete(p.id); }
+    // Tira das últimas linhas do produto o que passou do limite.
+    let sobra = qtdDoProduto(p.id) - limiteDe(p);
+    if (sobra <= 0) continue;
+    mudou = true;
+    for (const l of linhasDoProduto(p.id).reverse()) {
+      if (sobra <= 0) break;
+      const tira = Math.min(sobra, l.q); sobra -= tira;
+      if (l.q - tira > 0) carrinho.set(l.chave, l.q - tira); else carrinho.delete(l.chave);
+    }
   }
   return mudou;
 }
@@ -765,9 +855,10 @@ async function carregar() {
     // Vendas bloqueadas no painel da Zilado Pay: o totem fica ligado, mas não vende.
     const vendas = cat.dados.data.sales || loja.sales;
     bloqueio = vendas && vendas.blocked ? {message: vendas.message} : null;
-    // Produto que saiu do cardápio sai do carrinho.
-    const validos = new Set(produtos().map(p => p.id));
-    [...carrinho.keys()].forEach(id => validos.has(id) || carrinho.delete(id));
+    // Produto que saiu do cardápio sai do carrinho; escolha que deixou de valer (opção esgotada), também.
+    const validos = new Map(produtos().map(p => [p.id, p]));
+    [...carrinho.keys()].forEach(k => { const p = validos.get(idDaLinha(k)); if (!p || !linhaValida(p, k)) carrinho.delete(k); });
+    if (escolha && !validos.has(escolha.p.id)) fecharEscolha();
     ajustarCarrinhoAoEstoque();
     escolherTema();
     aplicarMarca(loja);
@@ -821,7 +912,7 @@ function aplicarMarca(dados) {
   });
   document.title = wl ? (marca.nome || 'Autoatendimento') : 'Zilado Pay';
   FRASE_PADRAO = wl ? FRASE_WHITELABEL : FRASE_ZILADO;
-  // O tema pode usar o logo do cliente (com ou sem marca branca), ex.: Mr Cold na tela inicial.
+  // O tema pode usar o logo do cliente (com ou sem marca branca) na tela inicial.
   if (tema && tema.logoEmpresa) tema.logoEmpresa(marca.logo_url);
 }
 function marcaGuardada() {
@@ -1213,7 +1304,25 @@ function desenharCardapio() {
         const img = el('img', {src: p.image_url, alt: ''});
         img.onload = () => { foto.textContent = ''; foto.append(img); };
       }
-      const q = carrinho.get(p.id) || 0;
+      const q = qtdDoProduto(p.id);
+      // Produto composto: "Escolher" abre a tela de escolha; as combinações já escolhidas ficam
+      // listadas no cartão, cada uma com o seu − e +.
+      if (composto(p)) {
+        grade.append(el('div', {class:'item' + (q ? ' no-pedido' : '')}, foto,
+          el('div', {class:'texto'},
+            el('div', {class:'nome'}, p.name),
+            p.description ? el('div', {class:'desc'}, p.description) : null,
+            seloRestam(p),
+            q ? el('div', {class:'escolhidas'}, ...linhasDoProduto(p.id).map(l => el('div', {class:'escolhida'},
+              el('span', {class:'t'}, textoEscolhas(p, l.chave) || 'Sem adicionais'),
+              el('div', {class:'qtd'},
+                el('button', {onclick: () => alterarLinha(l.chave, -1), 'aria-label': 'Menos ' + p.name}, '−'),
+                el('span', {}, String(l.q)),
+                Object.assign(el('button', {onclick: () => alterarLinha(l.chave, 1), 'aria-label': 'Mais ' + p.name}, '+'), {disabled: !podeMais(p)}))))) : null,
+            el('div', {class:'base'}, el('div', {class:'preco'}, textoPreco(p)),
+              Object.assign(el('button', {class:'adicionar', onclick: () => abrirEscolha(p)}, q ? '+ Outro' : '+ Escolher'), {disabled: !podeMais(p)})))));
+        continue;
+      }
       // Fora do pedido: botão "Adicionar". No pedido: − quantidade +.
       const controle = q
         ? el('div', {class:'qtd'},
@@ -1236,8 +1345,124 @@ function desenharCardapio() {
 }
 function alterar(id, d) {
   const p = produtos().find(x => x.id === id);
+  // Produto composto: "+" abre a tela de escolha; "−" tira uma unidade da última combinação.
+  if (composto(p)) {
+    if (d > 0) { if (podeMais(p)) abrirEscolha(p); return; }
+    const ult = linhasDoProduto(id).pop();
+    if (ult) alterarLinha(ult.chave, -1);
+    return;
+  }
   const q = Math.max(0, Math.min(p ? limiteDe(p) : MAX_POR_ITEM, (carrinho.get(id) || 0) + d));
   if (q) carrinho.set(id, q); else carrinho.delete(id);
+  desenharCardapio();
+}
+
+/** − e + de uma combinação de escolhas já no carrinho ("+" repete as mesmas escolhas). */
+function alterarLinha(chave, d) {
+  const p = produtos().find(x => x.id === idDaLinha(chave)); if (!p) return;
+  if (d > 0 && !podeMais(p)) return;
+  const q = Math.max(0, (carrinho.get(chave) || 0) + d);
+  if (q) carrinho.set(chave, q); else carrinho.delete(chave);
+  desenharCardapio();
+}
+
+/* ---------- Produto composto: tela de escolha ----------
+   Uma tela só, rolando, com os grupos na ordem do cadastro. Escolha única troca com um toque;
+   no máximo do grupo as outras opções apagam (sem mensagem de erro); completo o grupo, a tela
+   rola até o próximo que falta. O botão de baixo diz o que falta e, completo, vira
+   "Adicionar · R$". Opção esgotada aparece apagada, com "Esgotado". */
+let escolha = null; // {p, sel: Map(id da opção -> quantidade), qtd}
+function abrirEscolha(p) {
+  const sel = new Map();
+  // Opções "já marcadas" do cadastro (Colarinho no chopp), respeitando o máximo do grupo.
+  for (const g of p.option_groups) {
+    let n = 0;
+    for (const o of g.options) if (o.default && o.available && (g.max == null || n < g.max)) { sel.set(o.id, 1); n++; }
+  }
+  escolha = {p, sel, qtd: 1};
+  desenharEscolha();
+  $('escolha').hidden = false;
+  const lista = document.querySelector('#escolha .grupos'); if (lista) lista.scrollTop = 0;
+}
+function fecharEscolha() { escolha = null; $('escolha').hidden = true; $('escolha').textContent = ''; }
+const precoEscolha = () => escolha.p.price_cents + [...escolha.sel].reduce((s, [id, q]) => {
+  const x = opcoesDoProduto(escolha.p).find(y => y.o.id === id); return s + (x ? x.o.price_cents * q : 0); }, 0);
+const grupoQueFalta = () => escolha.p.option_groups.find(g => !grupoCompleto(g, escolha.sel));
+function tocarOpcao(g, o, d) {
+  if (!o.available) return;
+  const sel = escolha.sel, atual = sel.get(o.id) || 0, n = contaGrupo(g, sel);
+  if (d < 0) { if (atual > 1) sel.set(o.id, atual - 1); else sel.delete(o.id); }
+  else if (g.max === 1) {
+    if (atual) { if (!g.min) sel.delete(o.id); } // escolha opcional: tocar de novo desmarca
+    else { g.options.forEach(x => sel.delete(x.id)); sel.set(o.id, 1); }
+  }
+  else if (atual && !g.allow_repeat) sel.delete(o.id);
+  else if (g.max == null || n < g.max) sel.set(o.id, atual + 1);
+  else return; // no máximo: as outras estão apagadas
+  desenharEscolha();
+  // Completou o grupo (chegou ao máximo): leva ao próximo que falta.
+  if (d > 0 && g.max != null && contaGrupo(g, sel) === g.max) mostrarQueFalta(false);
+}
+function mostrarQueFalta(piscar) {
+  const g = grupoQueFalta(); if (!g) return;
+  const no = document.querySelector(`#escolha [data-grupo="${g.id}"]`); if (!no) return;
+  no.scrollIntoView({behavior: 'smooth', block: 'start'});
+  if (piscar) { no.classList.remove('pisca'); void no.offsetWidth; no.classList.add('pisca'); }
+}
+function desenharEscolha() {
+  const {p, sel} = escolha, caixa = $('escolha');
+  const rolagem = (caixa.querySelector('.grupos') || {}).scrollTop || 0;
+  caixa.textContent = '';
+  const grupos = el('div', {class:'grupos'});
+  for (const g of p.option_groups) {
+    const n = contaGrupo(g, sel), cheio = g.max != null && n >= g.max;
+    const regra = [g.rule];
+    if (g.min > 0 && g.max === 1) regra.push('obrigatório');
+    if (g.max != null && g.max > 1) regra.push(`${n} de ${g.max}`);
+    const opcoes = el('div', {class:'opcoes'});
+    for (const o of g.options) {
+      const q = sel.get(o.id) || 0;
+      const classe = 'opcao' + (q ? ' sel' : '') + (!o.available ? ' esgotada' : (!q && cheio && g.max !== 1 ? ' apagada' : ''));
+      const sub = !o.available ? 'Esgotado' : o.price_cents > 0 ? '+ ' + brl(o.price_cents) : null;
+      const rep = g.allow_repeat && q ? el('div', {class:'rep'},
+        el('button', {onclick: ev => { ev.stopPropagation(); tocarOpcao(g, o, -1); }, 'aria-label': 'Menos ' + o.name}, '−'),
+        el('b', {}, String(q)),
+        Object.assign(el('button', {onclick: ev => { ev.stopPropagation(); tocarOpcao(g, o, 1); }, 'aria-label': 'Mais ' + o.name}, '+'), {disabled: cheio})) : null;
+      opcoes.append(el('div', {class: classe, role: 'button', onclick: () => (g.allow_repeat && q ? null : tocarOpcao(g, o, 1))},
+        el('span', {}, (q && !g.allow_repeat ? '✓ ' : '') + o.name), sub ? el('small', {}, sub) : null, rep));
+    }
+    grupos.append(el('div', {class: 'grupo' + (grupoCompleto(g, sel) && n > 0 ? ' completo' : ''), 'data-grupo': String(g.id)},
+      el('div', {class:'grupo-cab'}, el('b', {}, g.name), el('span', {class:'regra'}, regra.join(' · '))), opcoes));
+  }
+  const falta = grupoQueFalta();
+  const livre = limiteDe(p) - qtdDoProduto(p.id);
+  escolha.qtd = Math.max(1, Math.min(escolha.qtd, livre));
+  const preco = precoEscolha();
+  const texto = falta
+    ? (falta.min - contaGrupo(falta, sel) === 1 ? `Escolha mais 1 em ${falta.name}` : `Escolha mais ${falta.min - contaGrupo(falta, sel)} em ${falta.name}`)
+    : 'Adicionar · ' + brl(preco * escolha.qtd);
+  caixa.append(
+    el('div', {class:'topo'},
+      el('button', {class:'fechar', onclick: fecharEscolha, 'aria-label': 'Voltar ao cardápio'}, '✕'),
+      el('h2', {}, p.name),
+      el('span', {class:'preco'}, brl(preco))),
+    grupos,
+    el('div', {class:'pe'},
+      el('div', {class:'linha-qtd'}, el('span', {}, 'Quantidade'),
+        el('div', {class:'qtd'},
+          Object.assign(el('button', {onclick: () => { escolha.qtd--; desenharEscolha(); }, 'aria-label': 'Menos'}, '−'), {disabled: escolha.qtd <= 1}),
+          el('span', {}, String(escolha.qtd)),
+          Object.assign(el('button', {onclick: () => { escolha.qtd++; desenharEscolha(); }, 'aria-label': 'Mais'}, '+'), {disabled: escolha.qtd >= livre}))),
+      el('button', {class: 'btn' + (falta ? ' incompleto' : ''), onclick: confirmarEscolha}, texto)));
+  caixa.querySelector('.grupos').scrollTop = rolagem;
+}
+function confirmarEscolha() {
+  if (grupoQueFalta()) return mostrarQueFalta(true);
+  const {p, sel, qtd} = escolha;
+  const livre = limiteDe(p) - qtdDoProduto(p.id); if (livre <= 0) return fecharEscolha();
+  const chave = chaveDaLinha(p.id, [...sel].map(([id, quantity]) => ({id, quantity})));
+  carrinho.set(chave, (carrinho.get(chave) || 0) + Math.min(qtd, livre));
+  fecharEscolha();
   desenharCardapio();
 }
 
@@ -1337,7 +1562,11 @@ async function garantirPedido() {
   if (leadUuid && lerFilaLeads().length) await enviarLeadsPendentes();
   const r = await api('POST', '/orders', {
     uuid: tentativa.uuid,
-    items: JSON.parse(assinatura()).map(([id, q]) => ({product_id: id, quantity: q})),
+    // Produto composto vai com as escolhas; o servidor confere a regra e soma o preço.
+    items: linhasDoCarrinho().map(l => {
+      const options = escolhasDaLinha(l.chave);
+      return {product_id: l.p.id, quantity: l.q, ...(options.length ? {options} : {})};
+    }),
     ...(entrega ? {fulfillment: entrega} : {}),
     ...(leadUuid ? {lead_uuid: leadUuid} : {}),
     ...(modoFiscal() === 'on_request' && nota ? {invoice: nota} : {}),
@@ -1373,6 +1602,7 @@ function reiniciar() {
   if (pedido && pedido.status === 'pending') api('POST', `/orders/${pedido.uuid}/cancel`).catch(() => {});
   pedido = null; tentativa = null; cartao = null; carrinho.clear(); entrega = null; nota = null;
   leadUuid = null; formRespondido = false;
+  if (escolha) fecharEscolha();
   desenharCardapio();
   if (loja) ir('inicio'); else iniciar();
 }
@@ -1424,7 +1654,8 @@ async function acompanharPix() {
     const r = await api('GET', `/orders/${pedido.uuid}`);
     if (!timerPix) return; // saiu da tela enquanto a consulta estava no ar
     if (r.ok) { guardarPedido(r.dados.data); aoMudarPedido(); }
-    else $('pixStatus').textContent = 'Sem conexão. Tentando de novo...';
+    // Sem resposta = rede; com resposta de erro = o servidor falhou (não é a internet do totem).
+    else $('pixStatus').textContent = r.status > 0 ? 'Não conseguimos confirmar o pagamento agora. Tentando de novo...' : 'Sem conexão. Tentando de novo...';
   } catch (_) { /* 401: já foi para o pareamento */ } finally { consultando = false; }
 }
 /** Decide a tela a partir da situação do pedido que veio do servidor. */
@@ -1520,13 +1751,24 @@ function mostrarMaquininha() {
   relogio(); timerMaqRelogio = setInterval(relogio, 1000);
   timerMaq = setInterval(acompanharMaquininha, 2000);
 }
+/** A maquininha deste totem está no modo PDV (pede o botão verde antes do cartão)? */
+function pedeBotaoVerde() {
+  const t = loja && loja.totem && loja.totem.terminal;
+  return !t || t.mode !== 'SELF_SERVICE';
+}
 /** Texto do passo atual, pela situação da cobrança na maquininha. */
 function passoMaquininha(pg) {
   const situacao = pg && pg.terminal ? pg.terminal.status : 'created';
   const pix = maquininha && maquininha.metodo === 'pix';
+  // Modo PDV (o padrão no Brasil): a cobrança chega à maquininha e espera o botão verde para
+  // começar. No autoatendimento (SELF_SERVICE) ela já abre pedindo o cartão.
+  const verde = pedeBotaoVerde() && !(maquininha && maquininha.desistindo)
+    && (situacao === 'created' || situacao === 'at_terminal');
+  $('maqVerde').hidden = !verde;
   let texto, alerta = false;
   if (maquininha && maquininha.desistindo) { texto = 'Cancele a operação na tela da maquininha.'; alerta = true; }
   else if (situacao === 'action_required' || situacao === 'check_on_terminal') { texto = 'Confira o resultado na tela da maquininha.'; alerta = true; }
+  else if (verde) texto = pix ? 'Depois, leia o QR Code com o app do seu banco.' : 'Depois, aproxime, insira ou passe o cartão.';
   else if (situacao === 'at_terminal') texto = pix ? 'Leia o QR Code na tela da maquininha com o app do seu banco.' : 'Aproxime, insira ou passe o cartão na maquininha.';
   else texto = 'Enviando para a maquininha...';
   $('maqPasso').textContent = texto;
@@ -1541,7 +1783,10 @@ async function acompanharMaquininha() {
     const r = await api('GET', `/orders/${pedido.uuid}`);
     if (!timerMaq) return; // saiu da tela enquanto a consulta estava no ar
     if (r.ok) { guardarPedido(r.dados.data); aoMudarMaquininha(); }
-    else $('maqPasso').textContent = 'Sem conexão. Tentando de novo...';
+    // Sem resposta = rede; com resposta de erro = o servidor falhou (não é a internet do totem).
+    else $('maqPasso').textContent = r.status > 0
+      ? 'Não conseguimos confirmar o pagamento agora. Tentando de novo...'
+      : 'Sem conexão. Tentando de novo...';
   } catch (_) { /* 401: já foi para o pareamento */ } finally { consultandoMaq = false; }
 }
 /** Decide a tela a partir do pedido que veio do servidor. */
@@ -1746,6 +1991,8 @@ async function sucessoPedido(forma) {
     if (telaAtual() !== 'resultado' || !pedido || pedido.code !== pago.pedido.code) return;
     pago.nota = n && n.status === 'authorized' ? n : null;
     pago.notaPendente = !pago.nota && n !== null; // venda com nota, mas ela não saiu (ou não a tempo)
+    // Página pública da nota (/nota/{token}): vai como QR Code no comprovante comum.
+    pago.notaUrl = pago.notaPendente ? ((n && n.public_url) || (notaVista && notaVista.public_url) || null) : null;
     log('nfc-e', {pedido: pago.pedido.code, situacao: n ? n.status : n === null ? 'sem nota' : 'sem resposta'});
     guardarUltimaVenda(pago); // a 2a via sai com o DANFE
     const seguiu = seguirVenda(pago, imprime);
@@ -1764,25 +2011,34 @@ function seguirVenda(pago, imprime) {
   sucessoComum(pago, imprime);
 }
 /** A NFC-e do pedido, como o servidor vê. Espera até ela ter resposta (autorizada,
-    rejeitada, com erro) ou até o prazo. null = a venda não tem nota; undefined = não deu tempo. */
+    rejeitada, com erro) ou até o prazo. undefined = não deu tempo. Só é chamada em venda
+    com nota (vendaComNota), então pedido pago ainda sem nota é tratado como "emitindo". */
+let notaVista = null; // última nota vista na espera (mesmo pendente): traz o public_url
 async function notaDoServidor(p) {
+  notaVista = p.invoice || null;
   if (p.invoice && p.invoice.status !== 'pending') return p.invoice;
+  // Prazo do painel (Fiscal > Espera da nota no totem); servidor sem o campo: 20 s, como antes.
+  const prazo = ((loja && loja.fiscal && loja.fiscal.wait_seconds) || 20) * 1000;
+  const fim = Date.now() + prazo;
   let ultima;
   const buscar = async () => {
-    for (let i = 0; i < 12; i++) {
+    while (Date.now() < fim) {
       await enviarPendentes(); // no cartão, o pagamento ainda pode estar na fila de envio
       const r = await api('GET', `/orders/${p.uuid}`);
       if (r.ok && r.dados.data.status === 'paid') {
+        // Sem nota ainda: o servidor cria a nota logo depois de gravar o pagamento (ou na
+        // varredura fiscal:recover). Como esta venda tem nota, segue esperando até o prazo.
         const n = r.dados.data.invoice;
-        if (n === null || n === undefined) return null;
-        ultima = n;
-        if (n.status !== 'pending') return n;
+        if (n) {
+          ultima = notaVista = n;
+          if (n.status !== 'pending') return n;
+        }
       }
       await new Promise(ok => setTimeout(ok, 1500));
     }
     return ultima && ultima.status !== 'pending' ? ultima : undefined;
   };
-  return Promise.race([buscar().catch(() => undefined), new Promise(ok => setTimeout(() => ok(undefined), 20000))]);
+  return Promise.race([buscar().catch(() => undefined), new Promise(ok => setTimeout(() => ok(undefined), prazo))]);
 }
 function sucessoComum(pago, imprime) {
   // Reimprimir não fica com o cliente: o atendente usa "Reimprimir última venda" no Diagnóstico.
@@ -1851,13 +2107,19 @@ function escreverComprovante(d, pago, rodape) {
   d.alinhar(0).regua();
   for (const i of p.items) {
     d.colunas(`${i.quantity}x ${i.name}`, dinheiro(i.total_cents));
+    // Produto composto: as escolhas embaixo do item.
+    if (i.options && i.options.length) d.texto('   ' + i.options.map(o => (o.quantity > 1 ? o.quantity + 'x ' : '') + o.name).join(', '));
     if (i.notes) d.texto('   obs: ' + i.notes);
   }
   d.regua().negrito(true).colunas('TOTAL', 'R$ ' + dinheiro(p.total_cents)).negrito(false);
   d.linha('Pagamento: ' + pago.forma);
   d.linha(dataHora(q));
-  // Venda com nota que não saiu a tempo: o estabelecimento emite pelo painel.
-  if (pago.notaPendente) d.regua().alinhar(1).texto('NFC-e em processamento. Solicite a nota fiscal ao atendente.').alinhar(0);
+  // Venda com nota que não saiu a tempo: o servidor segue emitindo. Com o endereço da página
+  // pública, o consumidor consulta pelo QR Code; sem ele (nota nem criada ainda), pede ao atendente.
+  if (pago.notaPendente && pago.notaUrl) {
+    d.regua().alinhar(1).texto('NFC-e em emissao. Consulte sua nota fiscal pelo QR Code:');
+    d.qr(pago.notaUrl, Escpos.COLUNAS === 48 ? 6 : 4).alinhar(0);
+  } else if (pago.notaPendente) d.regua().alinhar(1).texto('NFC-e em processamento. Solicite a nota fiscal ao atendente.').alinhar(0);
   return d.regua().alinhar(1).texto(rodape || 'Retire seu pedido no balcao.').alinhar(0);
 }
 const formatarCnpj = c => soDigitos(c).replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5');
@@ -2236,9 +2498,9 @@ function mostrarPapel() {
    mesmos códigos, e o balcão só aceita cada uma uma vez (ficha já entregue é recusada). */
 const CHAVE_ULTIMA_VENDA = 'totem.ultimaVenda';
 function guardarUltimaVenda(pago) {
-  const {pedido: p, forma, quando, nota, notaPendente} = pago;
+  const {pedido: p, forma, quando, nota, notaPendente, notaUrl} = pago;
   // A NFC-e vai junto: a 2a via sai com o DANFE.
-  try { localStorage.setItem(CHAVE_ULTIMA_VENDA, JSON.stringify({pedido: p, forma, quando: quando.toISOString(), nota: nota || null, notaPendente: !!notaPendente})); }
+  try { localStorage.setItem(CHAVE_ULTIMA_VENDA, JSON.stringify({pedido: p, forma, quando: quando.toISOString(), nota: nota || null, notaPendente: !!notaPendente, notaUrl: notaUrl || null})); }
   catch (_) { /* sem espaço: só perde a reimpressão */ }
 }
 function lerUltimaVenda() {
@@ -2268,7 +2530,8 @@ async function reimprimirUltimaVenda() {
   if (v.notaPendente) {
     const r = await api('GET', `/orders/${v.pedido.uuid}`).catch(() => null);
     const n = r && r.ok ? r.dados.data.invoice : null;
-    if (n && n.status === 'authorized') { v.nota = n; v.notaPendente = false; guardarUltimaVenda(v); }
+    if (n && n.status === 'authorized') { v.nota = n; v.notaPendente = false; v.notaUrl = null; guardarUltimaVenda(v); }
+    else if (n && n.public_url && !v.notaUrl) { v.notaUrl = n.public_url; guardarUltimaVenda(v); }
   }
   const pago = Object.assign(v, {segundaVia: true});
   const fichas = listarFichas(pago.pedido);
@@ -2337,7 +2600,7 @@ $('cantoAdmin').addEventListener('click', () => {
 
 /* =====================================================================
    TEMAS (aparência das telas do cliente)
-   Cada tema se registra em window.TEMAS (ver temas/mrcold.js). Quem escolhe, nesta ordem:
+   Cada tema se registra em window.TEMAS (temas/<nome>.js). Quem escolhe, nesta ordem:
    ?tema= na URL (testes no navegador), a escolha feita no Diagnóstico deste aparelho e,
    quando o painel mandar, loja.store.home.theme. Sem nada disso: o visual padrão da Zilado Pay.
    ===================================================================== */
