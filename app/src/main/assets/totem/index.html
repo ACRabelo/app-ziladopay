@@ -1760,16 +1760,19 @@ function pedeBotaoVerde() {
 function passoMaquininha(pg) {
   const situacao = pg && pg.terminal ? pg.terminal.status : 'created';
   const pix = maquininha && maquininha.metodo === 'pix';
-  // Modo PDV (o padrão no Brasil): a cobrança chega à maquininha e espera o botão verde para
-  // começar. No autoatendimento (SELF_SERVICE) ela já abre pedindo o cartão.
-  const verde = pedeBotaoVerde() && !(maquininha && maquininha.desistindo)
-    && (situacao === 'created' || situacao === 'at_terminal');
+  const desistindo = !!(maquininha && maquininha.desistindo);
+  const conferir = situacao === 'action_required' || situacao === 'check_on_terminal';
+  const naMaquininha = situacao === 'at_terminal';
+  // Modo PDV (o padrão no Brasil): a cobrança fica esperando o cliente apertar o botão verde
+  // para começar, então o pedido aparece logo depois do envio e some quando a maquininha
+  // pega a cobrança (at_terminal). No autoatendimento (SELF_SERVICE) ela já abre pedindo o cartão.
+  const verde = pedeBotaoVerde() && !desistindo && !conferir && !naMaquininha;
   $('maqVerde').hidden = !verde;
   let texto, alerta = false;
-  if (maquininha && maquininha.desistindo) { texto = 'Cancele a operação na tela da maquininha.'; alerta = true; }
-  else if (situacao === 'action_required' || situacao === 'check_on_terminal') { texto = 'Confira o resultado na tela da maquininha.'; alerta = true; }
+  if (desistindo) { texto = 'Cancele a operação na tela da maquininha.'; alerta = true; }
+  else if (conferir) { texto = 'Confira o resultado na tela da maquininha.'; alerta = true; }
+  else if (naMaquininha) texto = pix ? 'Leia o QR Code na tela da maquininha com o app do seu banco.' : 'Aproxime, insira ou passe o cartão na maquininha.';
   else if (verde) texto = pix ? 'Depois, leia o QR Code com o app do seu banco.' : 'Depois, aproxime, insira ou passe o cartão.';
-  else if (situacao === 'at_terminal') texto = pix ? 'Leia o QR Code na tela da maquininha com o app do seu banco.' : 'Aproxime, insira ou passe o cartão na maquininha.';
   else texto = 'Enviando para a maquininha...';
   $('maqPasso').textContent = texto;
   $('maqPasso').classList.toggle('alerta', alerta);
